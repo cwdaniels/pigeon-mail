@@ -14,13 +14,17 @@ class AppModeManager: ObservableObject {
     /// Apply the specified app mode
     /// - Parameter mode: "menuBar" (accessory), "dock" (regular), or "both" (regular)
     func applyMode(_ mode: String) {
-        switch mode {
-        case "dock", "both":
-            // .regular: Shows in dock and can have menu bar
-            NSApp.setActivationPolicy(.regular)
-        default:
-            // .accessory: Menu bar only, hidden from dock
-            NSApp.setActivationPolicy(.accessory)
+        // Defer to next run loop to ensure NSApp is initialized
+        DispatchQueue.main.async {
+            guard let app = NSApp else { return }
+            switch mode {
+            case "dock", "both":
+                // .regular: Shows in dock and can have menu bar
+                app.setActivationPolicy(.regular)
+            default:
+                // .accessory: Menu bar only, hidden from dock
+                app.setActivationPolicy(.accessory)
+            }
         }
     }
 
