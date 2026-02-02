@@ -68,6 +68,9 @@ struct PigeonMailApp: App {
     }
 
     init() {
+        // Apply app mode (dock/menu bar/both) on launch
+        AppModeManager.shared.applyCurrentMode()
+
         // Register global hotkey on app launch
         HotkeyManager.shared.registerGlobalHotkey()
 
