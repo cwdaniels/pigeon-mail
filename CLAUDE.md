@@ -1,7 +1,9 @@
 # Pigeon Mail - Project Status
 
+**Version 2.0** | Last Updated: February 2, 2026
+
 ## Overview
-Pigeon Mail is a macOS menu bar email client for sending emails via Gmail. It's a SwiftUI app using SwiftData for persistence.
+Pigeon Mail is a macOS menu bar email client for sending emails via Gmail. It's a SwiftUI app using SwiftData for persistence. Built with Claude Opus 4.5.
 
 ## Project Structure
 
@@ -129,7 +131,22 @@ SendOnly/
 - Xcode 15+
 - Google Cloud OAuth credentials
 
-## Recent Changes (Jan 2026)
+## Recent Changes (Feb 2026) - Version 2.0
+- **Favorites Bar**: Quick-access bar in compose window showing top 5 contacts
+  - Pin/unpin via context menu, pinned contacts appear first
+  - Usage tracked automatically after successful sends
+  - Toggle visibility in Settings > General
+- **Drafts Drawer**: Slide-out panel to browse Gmail drafts
+  - Click document icon in compose header to toggle
+  - Select draft to load into compose window
+  - Caches drafts, refresh button available
+- **App Mode Toggle**: Switch between menu bar, dock, or both
+  - Uses `NSApp.setActivationPolicy()` for instant switching
+  - No restart required
+- **About Tab**: Version info and Claude credits in Settings
+- App renamed to "Pigeon 2" in Applications folder
+
+## Previous Changes (Jan 2026)
 - Added network retry logic with exponential backoff
 - Added offline email queuing with auto-retry
 - Added scheduled email processing timer (60s interval)
