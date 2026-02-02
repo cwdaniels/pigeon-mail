@@ -4,9 +4,11 @@ A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pi
 
 ## Core Features
 
-### Menu Bar App
-- Lives in your macOS menu bar for quick access
-- Minimal footprint - no dock icon, no full window needed
+### App Mode
+- **Menu Bar Only**: Lives in your macOS menu bar, hidden from dock
+- **Dock Only**: Shows in dock like a regular app, still accessible from menu bar
+- **Both**: Appears in both menu bar and dock
+- Changes take effect immediately without restart
 - Custom menu bar icon (pigeon or envelope)
 
 ### Email Composition
@@ -16,6 +18,13 @@ A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pi
 - Markdown support for rich text formatting
 - File attachments
 - Custom email signatures
+
+### Drafts
+- **Auto-save**: Drafts automatically sync to Gmail every 3 seconds
+- **Drafts Drawer**: Slide-out panel in compose window to browse and load drafts
+- Click draft icon in compose header to toggle drawer
+- Select a draft to continue editing
+- Drafts are stored in Gmail, accessible from any device
 
 ### Undo Send
 - Configurable delay (5-30 seconds) before emails are actually sent
@@ -69,6 +78,13 @@ A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pi
 - Up to 50 recent contacts stored
 - Shown first when opening compose window
 
+### Favorites Bar
+- Quick-access bar in compose window showing top 5 frequently used addresses
+- Click to add contact to To: field
+- Pin/unpin contacts via right-click context menu
+- Pinned contacts always appear first
+- Toggle visibility in Settings > General
+
 ### Google Contacts Integration
 - Fetches contacts from Google People API
 - Includes "Other Contacts" (frequently emailed addresses)
@@ -97,10 +113,12 @@ A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pi
 ## Settings
 
 ### General
+- App mode (menu bar only, dock only, or both)
 - Menu bar icon style (pigeon/envelope)
 - Undo send delay duration
 - Send sound toggle with 13 selectable system sounds
 - Preview sounds before selecting
+- Favorites bar visibility toggle
 - Default email signature
 - Launch at login
 

@@ -16,7 +16,9 @@ SendOnly/
 │   │   ├── MenuBarView.swift      # Menu bar dropdown UI
 │   │   ├── SchedulePickerView.swift
 │   │   ├── SettingsView.swift
-│   │   └── UndoSendView.swift
+│   │   ├── UndoSendView.swift
+│   │   ├── DraftsDrawerView.swift # Slide-out drafts panel
+│   │   └── FavoritesBarView.swift # Quick-access favorites bar
 │   ├── Models/
 │   │   ├── Email.swift            # Email model + EmailSendState enum
 │   │   ├── Contact.swift          # Contact model with matchScore()
@@ -33,7 +35,9 @@ SendOnly/
 │   │   ├── EmailManager.swift     # Send state, scheduling, offline queue integration
 │   │   ├── DraftManager.swift     # Gmail draft management
 │   │   ├── HotkeyManager.swift    # Global hotkey registration + system sounds
-│   │   └── OfflineQueueManager.swift  # Offline email queue processing
+│   │   ├── OfflineQueueManager.swift  # Offline email queue processing
+│   │   ├── FavoritesManager.swift # Favorite contacts with pin/usage tracking
+│   │   └── AppModeManager.swift   # Dock/menu bar mode switching
 │   └── Resources/
 │       └── Assets.xcassets
 │           └── AppIcon.appiconset # Custom pigeon app icon
@@ -90,6 +94,18 @@ SendOnly/
 2. Google Workspace Directory (coworkers, requires `directory.readonly` scope)
 3. Personal Google Contacts (`/people/me/connections`)
 4. Other Contacts (frequently emailed addresses)
+
+### UserDefaults Storage Keys
+- `recentEmails` - Recent contacts array (PeopleService)
+- `favoriteEmails` - Favorite contacts with pin/usage data (FavoritesManager)
+- `showFavoritesBar` - Boolean toggle for favorites bar visibility
+- `appMode` - App mode: "menuBar", "dock", or "both"
+
+### AppModeManager
+- Uses `NSApp.setActivationPolicy()` for dynamic switching
+- `.accessory` = menu bar only (hidden from dock)
+- `.regular` = shows in dock (used for "dock" and "both" modes)
+- Changes take effect immediately without restart
 
 ### System Sound Playback
 - Uses `AudioToolbox` framework with `AudioServicesPlaySystemSound`

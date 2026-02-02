@@ -33,6 +33,10 @@
 		A1000024 /* ContactMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* ContactMatchingTests.swift */; };
 		A1000025 /* ScheduledEmailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* ScheduledEmailTests.swift */; };
 		A1000026 /* QueuedEmailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* QueuedEmailTests.swift */; };
+		A1000027 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* FavoritesManager.swift */; };
+		A1000028 /* AppModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* AppModeManager.swift */; };
+		A1000029 /* FavoritesBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* FavoritesBarView.swift */; };
+		A1000030 /* DraftsDrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* DraftsDrawerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +80,10 @@
 		A2000028 /* ContactMatchingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactMatchingTests.swift; sourceTree = "<group>"; };
 		A2000029 /* ScheduledEmailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledEmailTests.swift; sourceTree = "<group>"; };
 		A2000030 /* QueuedEmailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuedEmailTests.swift; sourceTree = "<group>"; };
+		A2000031 /* FavoritesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesManager.swift; sourceTree = "<group>"; };
+		A2000032 /* AppModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModeManager.swift; sourceTree = "<group>"; };
+		A2000033 /* FavoritesBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesBarView.swift; sourceTree = "<group>"; };
+		A2000034 /* DraftsDrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftsDrawerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +136,8 @@
 				A2000004 /* SchedulePickerView.swift */,
 				A2000005 /* UndoSendView.swift */,
 				A2000006 /* SettingsView.swift */,
+				A2000033 /* FavoritesBarView.swift */,
+				A2000034 /* DraftsDrawerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -163,6 +173,8 @@
 				A2000015 /* DraftManager.swift */,
 				A2000016 /* HotkeyManager.swift */,
 				A2000026 /* OfflineQueueManager.swift */,
+				A2000031 /* FavoritesManager.swift */,
+				A2000032 /* AppModeManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -307,6 +319,10 @@
 				A1000020 /* NetworkMonitor.swift in Sources */,
 				A1000021 /* QueuedEmail.swift in Sources */,
 				A1000022 /* OfflineQueueManager.swift in Sources */,
+				A1000027 /* FavoritesManager.swift in Sources */,
+				A1000028 /* AppModeManager.swift in Sources */,
+				A1000029 /* FavoritesBarView.swift in Sources */,
+				A1000030 /* DraftsDrawerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
