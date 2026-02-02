@@ -117,11 +117,16 @@ final class EmailManager: ObservableObject {
             pendingEmail = nil
             pendingEmailRecipient = nil
 
-            // Record recipients for autocomplete
+            // Record recipients for autocomplete and favorites
             Task {
                 for recipient in email.to + email.cc + email.bcc {
                     await PeopleService.shared.addRecentEmail(recipient)
                 }
+            }
+
+            // Record usage for favorites bar
+            for recipient in email.to + email.cc + email.bcc {
+                FavoritesManager.shared.recordUsage(email: recipient)
             }
 
             // Reset to idle after showing success
@@ -206,6 +211,11 @@ final class EmailManager: ObservableObject {
                     // Record recipients for autocomplete
                     for recipient in email.to + email.cc + email.bcc {
                         await PeopleService.shared.addRecentEmail(recipient)
+                    }
+
+                    // Record usage for favorites bar
+                    for recipient in email.to + email.cc + email.bcc {
+                        FavoritesManager.shared.recordUsage(email: recipient)
                     }
 
                     // Post success notification

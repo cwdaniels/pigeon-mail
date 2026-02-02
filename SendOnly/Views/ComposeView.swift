@@ -94,6 +94,7 @@ struct ComposeView: View {
     @EnvironmentObject private var authService: AuthService
     @EnvironmentObject private var emailManager: EmailManager
     @StateObject private var draftManager = DraftManager.shared
+    @StateObject private var favoritesManager = FavoritesManager.shared
     @StateObject private var editorCoordinator = TextEditorCoordinator()
 
     @State private var toField = ""
@@ -110,6 +111,7 @@ struct ComposeView: View {
     @State private var linkURL = ""
     @State private var contactSuggestions: [Contact] = []
     @State private var activeField: RecipientField = .to
+    @State private var showDraftsDrawer = false
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -120,111 +122,136 @@ struct ComposeView: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                // Header
-                composeHeader
-
-                Divider()
-
-                // Recipients
-                VStack(spacing: 8) {
-                    recipientRow(label: "To:", text: $toField, field: .to, emails: $emailManager.currentEmail.to)
-
-                    if showCC {
-                        recipientRow(label: "Cc:", text: $ccField, field: .cc, emails: $emailManager.currentEmail.cc)
-                    }
-
-                    if showBCC {
-                        recipientRow(label: "Bcc:", text: $bccField, field: .bcc, emails: $emailManager.currentEmail.bcc)
-                    }
-
-                    // Subject
-                    HStack {
-                        Text("Subject:")
-                            .foregroundColor(.secondary)
-                            .frame(width: 60, alignment: .trailing)
-
-                        TextField("", text: $emailManager.currentEmail.subject)
-                            .textFieldStyle(.plain)
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.vertical, 12)
-
-                Divider()
-
-                // Body with markdown toolbar
-                VStack(alignment: .leading, spacing: 0) {
-                    // Formatting toolbar
-                    HStack(spacing: 12) {
-                        Button { editorCoordinator.applyFormatting(prefix: "**", suffix: "**") } label: {
-                            Image(systemName: "bold")
+            HStack(spacing: 0) {
+                // Drafts drawer (slides in from left)
+                if showDraftsDrawer {
+                    DraftsDrawerView(
+                        onSelectDraft: { draft in
+                            loadDraftIntoCompose(draft)
+                        },
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showDraftsDrawer = false
+                            }
                         }
-                        .keyboardShortcut("b", modifiers: .command)
-                        .help("Bold (⌘B)")
-
-                        Button { editorCoordinator.applyFormatting(prefix: "*", suffix: "*") } label: {
-                            Image(systemName: "italic")
-                        }
-                        .keyboardShortcut("i", modifiers: .command)
-                        .help("Italic (⌘I)")
-
-                        Button {
-                            linkText = editorCoordinator.getSelectedText()
-                            showLinkSheet = true
-                        } label: {
-                            Image(systemName: "link")
-                        }
-                        .keyboardShortcut("k", modifiers: .command)
-                        .help("Insert Link (⌘K)")
-
-                        Divider().frame(height: 16)
-
-                        Button { editorCoordinator.insertAtLineStart("- ") } label: {
-                            Image(systemName: "list.bullet")
-                        }
-                        .help("Bullet List")
-
-                        Button { insertNumberedList() } label: {
-                            Image(systemName: "list.number")
-                        }
-                        .help("Numbered List")
-
-                        Button { editorCoordinator.applyFormatting(prefix: "`", suffix: "`") } label: {
-                            Image(systemName: "chevron.left.forwardslash.chevron.right")
-                        }
-                        .help("Code")
-
-                        Spacer()
-
-                        Button("Preview") {
-                            showMarkdownPreview = true
-                        }
-                        .font(.caption)
-                        .buttonStyle(.plain)
-                        .foregroundColor(.accentColor)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color(NSColor.controlBackgroundColor))
-
-                    MarkdownTextEditor(text: $emailManager.currentEmail.body, coordinator: editorCoordinator)
-                        .frame(maxHeight: .infinity)
+                    )
+                    .transition(.move(edge: .leading))
                 }
 
-                // Attachments
-                if !emailManager.currentEmail.attachments.isEmpty {
+                // Main compose content
+                VStack(spacing: 0) {
+                    // Header
+                    composeHeader
+
+                    // Favorites bar (when enabled and has favorites)
+                    if favoritesManager.showFavoritesBar {
+                        FavoritesBarView { favorite in
+                            addFavoriteToRecipients(favorite)
+                        }
+                    }
+
                     Divider()
-                    attachmentsView
+
+                    // Recipients
+                    VStack(spacing: 8) {
+                        recipientRow(label: "To:", text: $toField, field: .to, emails: $emailManager.currentEmail.to)
+
+                        if showCC {
+                            recipientRow(label: "Cc:", text: $ccField, field: .cc, emails: $emailManager.currentEmail.cc)
+                        }
+
+                        if showBCC {
+                            recipientRow(label: "Bcc:", text: $bccField, field: .bcc, emails: $emailManager.currentEmail.bcc)
+                        }
+
+                        // Subject
+                        HStack {
+                            Text("Subject:")
+                                .foregroundColor(.secondary)
+                                .frame(width: 60, alignment: .trailing)
+
+                            TextField("", text: $emailManager.currentEmail.subject)
+                                .textFieldStyle(.plain)
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.vertical, 12)
+
+                    Divider()
+
+                    // Body with markdown toolbar
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Formatting toolbar
+                        HStack(spacing: 12) {
+                            Button { editorCoordinator.applyFormatting(prefix: "**", suffix: "**") } label: {
+                                Image(systemName: "bold")
+                            }
+                            .keyboardShortcut("b", modifiers: .command)
+                            .help("Bold (⌘B)")
+
+                            Button { editorCoordinator.applyFormatting(prefix: "*", suffix: "*") } label: {
+                                Image(systemName: "italic")
+                            }
+                            .keyboardShortcut("i", modifiers: .command)
+                            .help("Italic (⌘I)")
+
+                            Button {
+                                linkText = editorCoordinator.getSelectedText()
+                                showLinkSheet = true
+                            } label: {
+                                Image(systemName: "link")
+                            }
+                            .keyboardShortcut("k", modifiers: .command)
+                            .help("Insert Link (⌘K)")
+
+                            Divider().frame(height: 16)
+
+                            Button { editorCoordinator.insertAtLineStart("- ") } label: {
+                                Image(systemName: "list.bullet")
+                            }
+                            .help("Bullet List")
+
+                            Button { insertNumberedList() } label: {
+                                Image(systemName: "list.number")
+                            }
+                            .help("Numbered List")
+
+                            Button { editorCoordinator.applyFormatting(prefix: "`", suffix: "`") } label: {
+                                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                            }
+                            .help("Code")
+
+                            Spacer()
+
+                            Button("Preview") {
+                                showMarkdownPreview = true
+                            }
+                            .font(.caption)
+                            .buttonStyle(.plain)
+                            .foregroundColor(.accentColor)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(NSColor.controlBackgroundColor))
+
+                        MarkdownTextEditor(text: $emailManager.currentEmail.body, coordinator: editorCoordinator)
+                            .frame(maxHeight: .infinity)
+                    }
+
+                    // Attachments
+                    if !emailManager.currentEmail.attachments.isEmpty {
+                        Divider()
+                        attachmentsView
+                    }
+
+                    Divider()
+
+                    // Footer
+                    composeFooter
                 }
-
-                Divider()
-
-                // Footer
-                composeFooter
-            }
+            } // End HStack
 
             // Contact suggestions overlay
             if !contactSuggestions.isEmpty {
@@ -279,6 +306,18 @@ struct ComposeView: View {
 
     private var composeHeader: some View {
         HStack {
+            // Drafts drawer toggle
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showDraftsDrawer.toggle()
+                }
+            } label: {
+                Image(systemName: "doc.text")
+                    .foregroundColor(showDraftsDrawer ? .accentColor : .secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Browse Drafts")
+
             Text("New Message")
                 .font(.headline)
 
@@ -562,6 +601,26 @@ struct ComposeView: View {
     private func isValidEmail(_ email: String) -> Bool {
         let emailRegex = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
         return email.range(of: emailRegex, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    private func addFavoriteToRecipients(_ favorite: FavoriteContact) {
+        // Don't add duplicates
+        guard !emailManager.currentEmail.to.contains(where: { $0.lowercased() == favorite.email.lowercased() }) else {
+            return
+        }
+        emailManager.currentEmail.to.append(favorite.email)
+    }
+
+    private func loadDraftIntoCompose(_ draft: DraftSummary) {
+        Task {
+            if let email = await draftManager.loadDraft(draft.id) {
+                emailManager.currentEmail = email
+                // Close the drawer after loading
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showDraftsDrawer = false
+                }
+            }
+        }
     }
 
     // MARK: - Markdown Formatting

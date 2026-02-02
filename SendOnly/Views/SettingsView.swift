@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("playSendSound") private var playSendSound: Bool = true
     @AppStorage("sendSoundName") private var sendSoundName: String = "Blow"
     @AppStorage("appMode") private var appMode: String = "menuBar"
+    @AppStorage("showFavoritesBar") private var showFavoritesBar: Bool = true
 
     @State private var clientId: String = ""
     @State private var clientSecret: String = ""
@@ -50,7 +51,7 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.radioGroup)
                 .onChange(of: appMode) { _, newValue in
-                    applyAppMode(newValue)
+                    AppModeManager.shared.applyMode(newValue)
                 }
 
                 Text("Changes take effect immediately")
@@ -109,6 +110,14 @@ struct SettingsView: View {
                     .font(.body)
 
                 Text("This signature will be added to all new emails")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Section("Favorites Bar") {
+                Toggle("Show favorites bar in compose window", isOn: $showFavoritesBar)
+
+                Text("Quick access to your most-used email addresses")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
