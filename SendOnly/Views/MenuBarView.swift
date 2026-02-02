@@ -265,9 +265,7 @@ struct MenuBarView: View {
                 Task {
                     do {
                         try await authService.signIn()
-                        print("Sign in completed successfully, isAuthenticated: \(authService.isAuthenticated)")
                     } catch {
-                        print("Sign in error: \(error)")
                         authService.error = error as? AuthError ?? AuthError.authenticationFailed(error.localizedDescription)
                     }
                 }

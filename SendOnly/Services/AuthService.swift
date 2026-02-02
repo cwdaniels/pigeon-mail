@@ -294,12 +294,9 @@ final class AuthService: ObservableObject {
         let tokenResponse = try JSONDecoder().decode(TokenResponse.self, from: data)
         let tokens = tokenResponse.toOAuthTokens()
 
-        print("Token exchange successful, saving tokens...")
         try keychain.saveTokens(tokens)
         self.tokens = tokens
-        print("Setting isAuthenticated = true")
         isAuthenticated = true
-        print("isAuthenticated is now: \(isAuthenticated)")
         codeVerifier = nil
     }
 
@@ -320,7 +317,7 @@ final class AuthService: ObservableObject {
                 }
             }
         } catch {
-            print("Failed to fetch user info: \(error)")
+            // User info fetch failed silently - non-critical
         }
     }
 

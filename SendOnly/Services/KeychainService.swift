@@ -54,7 +54,6 @@ final class KeychainService {
 
         let data = try JSONEncoder().encode(tokens)
         try data.write(to: fileURL, options: .atomic)
-        print("Tokens saved to: \(fileURL.path)")
     }
 
     func loadTokens() throws -> OAuthTokens {
@@ -68,7 +67,6 @@ final class KeychainService {
 
         let data = try Data(contentsOf: fileURL)
         let tokens = try JSONDecoder().decode(OAuthTokens.self, from: data)
-        print("Tokens loaded from: \(fileURL.path)")
         return tokens
     }
 
@@ -79,7 +77,6 @@ final class KeychainService {
 
         if fileManager.fileExists(atPath: fileURL.path) {
             try fileManager.removeItem(at: fileURL)
-            print("Tokens deleted")
         }
     }
 }

@@ -47,6 +47,16 @@ struct Email: Identifiable, Codable, Equatable {
         !to.isEmpty || !cc.isEmpty || !bcc.isEmpty
     }
 
+    /// Escapes HTML special characters to prevent XSS
+    private func escapeHTML(_ string: String) -> String {
+        string
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&#39;")
+    }
+
     /// Converts markdown to HTML
     func markdownToHTML(_ markdown: String) -> String {
         var lines = markdown.components(separatedBy: "\n")
@@ -55,7 +65,8 @@ struct Email: Identifiable, Codable, Equatable {
         var inOrderedList = false
 
         for line in lines {
-            var processedLine = line
+            // Escape HTML first to prevent injection
+            var processedLine = escapeHTML(line)
 
             // Bold: **text** or __text__
             processedLine = processedLine.replacingOccurrences(
