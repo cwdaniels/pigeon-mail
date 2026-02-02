@@ -32,8 +32,13 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Shortcuts", systemImage: "keyboard")
                 }
+
+            aboutTab
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
         }
-        .frame(width: 450, height: 350)
+        .frame(width: 450, height: 400)
         .onAppear {
             loadOAuthConfig()
         }
@@ -246,6 +251,67 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .padding()
+    }
+
+    // MARK: - About Tab
+
+    private var aboutTab: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            // App icon and name
+            Image(systemName: "bird.fill")
+                .font(.system(size: 64))
+                .foregroundColor(.accentColor)
+
+            Text("Pigeon Mail")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Version 2.0")
+                .font(.title3)
+                .foregroundColor(.secondary)
+
+            Divider()
+                .frame(width: 200)
+
+            // Details
+            VStack(spacing: 8) {
+                Text("Last Updated: February 2, 2026")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text("A fast, lightweight email client for macOS")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Divider()
+                .frame(width: 200)
+
+            // Credits
+            VStack(spacing: 4) {
+                Text("Built with Claude")
+                    .font(.headline)
+
+                Text("Powered by Claude Opus 4.5")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text("Anthropic")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            // Footer
+            Text("Made with AI assistance")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .padding(.bottom, 8)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Helpers
