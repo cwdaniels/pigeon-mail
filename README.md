@@ -1,11 +1,11 @@
-# SendOnly
+# Pigeon Mail
 
-A lightweight macOS menu bar app for writing and sending emails without the distraction of an inbox. Integrates with Gmail for sending, contacts, and draft syncing.
+A delightfully simple macOS menu bar email client for Gmail. Send emails without the distraction of an inbox.
 
 ## Features
 
-- **Menu bar app** - Lives in macOS menu bar, click to open compose window
-- **Keyboard shortcuts** - Global hotkey (⌘⇧M) to open compose from any app
+- **Menu bar app** - Lives in macOS menu bar, always one click away
+- **Global hotkey** - Press ⌘⌥⇧M from any app to compose
 - **Send emails** - Via Gmail API (no inbox access)
 - **Contact autocomplete** - Pull from Gmail contacts via People API
 - **Undo send** - Configurable delay (5-30 seconds) before actually sending
@@ -14,7 +14,7 @@ A lightweight macOS menu bar app for writing and sending emails without the dist
 
 ## Requirements
 
-- macOS 13.0 (Ventura) or later
+- macOS 14.0 (Sonoma) or later
 - Xcode 15.0 or later
 - Google Cloud project with Gmail API and People API enabled
 
