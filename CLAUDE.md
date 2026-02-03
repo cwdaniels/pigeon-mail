@@ -146,6 +146,17 @@ SendOnly/
 - **About Tab**: Version info and Claude credits in Settings
 - App renamed to "Pigeon 2" in Applications folder
 
+## Security Hardening (Feb 2, 2026)
+- Added `.gitignore` to exclude credentials, tokens, xcuserdata, build artifacts
+- Removed debug `print()` statements that exposed token paths
+- Added `escapeHTML()` function to prevent XSS in markdown-to-HTML conversion
+- Note: Internal identifiers remain "SendOnly" for compatibility; user-facing text is "Pigeon Mail"
+
+## GitHub
+- **Repo**: https://github.com/cwdaniels/pigeon-mail
+- **Website**: https://cwdaniels.github.io/pigeon-mail/ (separate project)
+- **Branch**: `feature/v2-enhancements` (default)
+
 ## Previous Changes (Jan 2026)
 - Added network retry logic with exponential backoff
 - Added offline email queuing with auto-retry
