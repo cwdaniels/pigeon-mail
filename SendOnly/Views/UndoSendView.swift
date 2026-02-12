@@ -61,7 +61,7 @@ struct UndoSendView: View {
             .padding(40)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(NSColor.windowBackgroundColor).opacity(0.9))
+                    .fill(Color.platformWindowBackground.opacity(0.9))
                     .shadow(radius: 20)
             )
         }

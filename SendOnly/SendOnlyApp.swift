@@ -6,11 +6,13 @@ import Combine
 struct PigeonMailApp: App {
     @StateObject private var authService = AuthService.shared
     @StateObject private var emailManager = EmailManager.shared
-    @StateObject private var hotkeyManager = HotkeyManager.shared
     @StateObject private var networkMonitor = NetworkMonitor.shared
     @StateObject private var offlineQueueManager = OfflineQueueManager.shared
 
+    #if os(macOS)
+    @StateObject private var hotkeyManager = HotkeyManager.shared
     @AppStorage("menuBarIcon") private var menuBarIcon: String = "pigeon"
+    #endif
 
     // Timer for processing scheduled emails every 60 seconds
     private let scheduledEmailTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -30,6 +32,7 @@ struct PigeonMailApp: App {
     }()
 
     var body: some Scene {
+        #if os(macOS)
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(authService)
@@ -65,14 +68,31 @@ struct PigeonMailApp: App {
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 600, height: 500)
         .keyboardShortcut("m", modifiers: [.command, .option, .shift])
+        #endif
+
+        #if os(iOS)
+        WindowGroup {
+            iOSMainView()
+                .environmentObject(authService)
+                .environmentObject(emailManager)
+                .environmentObject(offlineQueueManager)
+                .environmentObject(networkMonitor)
+                .modelContainer(sharedModelContainer)
+                .onReceive(scheduledEmailTimer) { _ in
+                    processScheduledEmails()
+                }
+        }
+        #endif
     }
 
     init() {
+        #if os(macOS)
         // Apply app mode (dock/menu bar/both) on launch
         AppModeManager.shared.applyCurrentMode()
 
         // Register global hotkey on app launch
         HotkeyManager.shared.registerGlobalHotkey()
+        #endif
 
         // Configure OfflineQueueManager with model context
         let container = sharedModelContainer

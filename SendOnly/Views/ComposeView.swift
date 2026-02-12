@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
@@ -187,13 +188,13 @@ struct ComposeView: View {
                                 Image(systemName: "bold")
                             }
                             .keyboardShortcut("b", modifiers: .command)
-                            .help("Bold (⌘B)")
+                            .help("Bold (\u{2318}B)")
 
                             Button { editorCoordinator.applyFormatting(prefix: "*", suffix: "*") } label: {
                                 Image(systemName: "italic")
                             }
                             .keyboardShortcut("i", modifiers: .command)
-                            .help("Italic (⌘I)")
+                            .help("Italic (\u{2318}I)")
 
                             Button {
                                 linkText = editorCoordinator.getSelectedText()
@@ -202,7 +203,7 @@ struct ComposeView: View {
                                 Image(systemName: "link")
                             }
                             .keyboardShortcut("k", modifiers: .command)
-                            .help("Insert Link (⌘K)")
+                            .help("Insert Link (\u{2318}K)")
 
                             Divider().frame(height: 16)
 
@@ -234,7 +235,7 @@ struct ComposeView: View {
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Color(NSColor.controlBackgroundColor))
+                        .background(Color.platformControlBackground)
 
                         MarkdownTextEditor(text: $emailManager.currentEmail.body, coordinator: editorCoordinator)
                             .frame(maxHeight: .infinity)
@@ -476,7 +477,7 @@ struct ComposeView: View {
                         }
                     }
                 }
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(Color.platformControlBackground)
                 .cornerRadius(8)
                 .shadow(radius: 4)
                 .frame(maxWidth: 350)
@@ -500,7 +501,7 @@ struct ComposeView: View {
                     .font(.headline)
             }
             .padding(40)
-            .background(Color(NSColor.windowBackgroundColor))
+            .background(Color.platformWindowBackground)
             .cornerRadius(12)
         }
     }
@@ -516,7 +517,7 @@ struct ComposeView: View {
                     .font(.headline)
             }
             .padding(40)
-            .background(Color(NSColor.windowBackgroundColor))
+            .background(Color.platformWindowBackground)
             .cornerRadius(12)
         }
     }
@@ -700,90 +701,6 @@ struct ComposeView: View {
     }
 }
 
-// MARK: - Email Chip
-
-struct EmailChip: View {
-    let email: String
-    let onRemove: () -> Void
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Text(email)
-                .font(.callout)
-                .lineLimit(1)
-
-            Button {
-                onRemove()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.accentColor.opacity(0.2))
-        .cornerRadius(12)
-    }
-}
-
-// MARK: - Attachment Chip
-
-struct AttachmentChip: View {
-    let attachment: Attachment
-    let onRemove: () -> Void
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: iconForMimeType(attachment.mimeType))
-                .foregroundColor(.secondary)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text(attachment.filename)
-                    .font(.caption)
-                    .lineLimit(1)
-                Text(formatFileSize(attachment.data.count))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-
-            Button {
-                onRemove()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color(NSColor.controlBackgroundColor))
-        .cornerRadius(8)
-    }
-
-    private func iconForMimeType(_ mimeType: String) -> String {
-        if mimeType.hasPrefix("image/") { return "photo" }
-        if mimeType.hasPrefix("video/") { return "film" }
-        if mimeType.hasPrefix("audio/") { return "music.note" }
-        if mimeType.contains("pdf") { return "doc.text" }
-        if mimeType.contains("zip") { return "doc.zipper" }
-        if mimeType.contains("word") || mimeType.contains("document") { return "doc.richtext" }
-        if mimeType.contains("sheet") || mimeType.contains("excel") { return "tablecells" }
-        if mimeType.contains("presentation") || mimeType.contains("powerpoint") { return "rectangle.on.rectangle" }
-        return "doc"
-    }
-
-    private func formatFileSize(_ bytes: Int) -> String {
-        let kb = Double(bytes) / 1024
-        if kb < 1024 {
-            return String(format: "%.1f KB", kb)
-        }
-        let mb = kb / 1024
-        return String(format: "%.1f MB", mb)
-    }
-}
-
 // MARK: - Markdown Text Editor
 
 struct MarkdownTextEditor: NSViewRepresentable {
@@ -842,47 +759,6 @@ struct MarkdownTextEditor: NSViewRepresentable {
     }
 }
 
-// MARK: - Insert Link View
-
-struct InsertLinkView: View {
-    @Binding var text: String
-    @Binding var url: String
-    let onInsert: (String, String) -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Insert Link")
-                .font(.headline)
-
-            TextField("Link text", text: $text)
-                .textFieldStyle(.roundedBorder)
-
-            TextField("URL", text: $url)
-                .textFieldStyle(.roundedBorder)
-
-            HStack {
-                Button("Cancel") {
-                    dismiss()
-                }
-                .keyboardShortcut(.escape)
-
-                Spacer()
-
-                Button("Insert") {
-                    onInsert(text.isEmpty ? url : text, url)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .disabled(url.isEmpty)
-                .buttonStyle(.borderedProminent)
-            }
-        }
-        .padding()
-        .frame(width: 350)
-    }
-}
-
 // MARK: - Markdown Preview View
 
 struct MarkdownPreviewView: View {
@@ -920,170 +796,9 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        let html = convertMarkdownToHTML(markdown)
+        let email = Email()
+        let html = email.markdownToHTML(markdown)
         webView.loadHTMLString(html, baseURL: nil)
-    }
-
-    private func convertMarkdownToHTML(_ markdown: String) -> String {
-        var lines = markdown.components(separatedBy: "\n")
-        var htmlLines: [String] = []
-        var inUnorderedList = false
-        var inOrderedList = false
-
-        for line in lines {
-            var processedLine = line
-
-            // Escape HTML special characters
-            processedLine = processedLine.replacingOccurrences(of: "&", with: "&amp;")
-            processedLine = processedLine.replacingOccurrences(of: "<", with: "&lt;")
-            processedLine = processedLine.replacingOccurrences(of: ">", with: "&gt;")
-
-            // Bold: **text**
-            processedLine = processedLine.replacingOccurrences(of: #"\*\*(.+?)\*\*"#, with: "<strong>$1</strong>", options: .regularExpression)
-
-            // Italic: *text*
-            processedLine = processedLine.replacingOccurrences(of: #"\*(.+?)\*"#, with: "<em>$1</em>", options: .regularExpression)
-
-            // Code: `text`
-            processedLine = processedLine.replacingOccurrences(of: #"`(.+?)`"#, with: "<code>$1</code>", options: .regularExpression)
-
-            // Links: [text](url)
-            processedLine = processedLine.replacingOccurrences(of: #"\[(.+?)\]\((.+?)\)"#, with: "<a href=\"$2\">$1</a>", options: .regularExpression)
-
-            // Headers
-            if processedLine.hasPrefix("### ") {
-                processedLine = "<h3>\(String(processedLine.dropFirst(4)))</h3>"
-            } else if processedLine.hasPrefix("## ") {
-                processedLine = "<h2>\(String(processedLine.dropFirst(3)))</h2>"
-            } else if processedLine.hasPrefix("# ") {
-                processedLine = "<h1>\(String(processedLine.dropFirst(2)))</h1>"
-            }
-            // Unordered list: - item
-            else if processedLine.hasPrefix("- ") || processedLine.hasPrefix("* ") {
-                if !inUnorderedList {
-                    if inOrderedList {
-                        htmlLines.append("</ol>")
-                        inOrderedList = false
-                    }
-                    htmlLines.append("<ul>")
-                    inUnorderedList = true
-                }
-                processedLine = "<li>\(String(processedLine.dropFirst(2)))</li>"
-            }
-            // Ordered list: 1. item
-            else if let _ = processedLine.range(of: #"^\d+\. "#, options: .regularExpression) {
-                if !inOrderedList {
-                    if inUnorderedList {
-                        htmlLines.append("</ul>")
-                        inUnorderedList = false
-                    }
-                    htmlLines.append("<ol>")
-                    inOrderedList = true
-                }
-                // Remove the number prefix
-                if let range = processedLine.range(of: #"^\d+\. "#, options: .regularExpression) {
-                    processedLine = "<li>\(String(processedLine[range.upperBound...]))</li>"
-                }
-            }
-            // Regular paragraph or empty line
-            else {
-                if inUnorderedList {
-                    htmlLines.append("</ul>")
-                    inUnorderedList = false
-                }
-                if inOrderedList {
-                    htmlLines.append("</ol>")
-                    inOrderedList = false
-                }
-                if processedLine.isEmpty {
-                    processedLine = "<br>"
-                } else {
-                    processedLine = "<p>\(processedLine)</p>"
-                }
-            }
-
-            htmlLines.append(processedLine)
-        }
-
-        // Close any open lists
-        if inUnorderedList {
-            htmlLines.append("</ul>")
-        }
-        if inOrderedList {
-            htmlLines.append("</ol>")
-        }
-
-        let body = htmlLines.joined(separator: "\n")
-
-        return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <meta charset="utf-8">
-        <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; line-height: 1.6; padding: 16px; color: #333; }
-        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: Menlo, Monaco, monospace; font-size: 13px; }
-        a { color: #007AFF; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        ul, ol { margin: 8px 0; padding-left: 24px; }
-        li { margin: 4px 0; }
-        h1, h2, h3 { margin: 16px 0 8px 0; }
-        p { margin: 8px 0; }
-        strong { font-weight: 600; }
-        </style>
-        </head>
-        <body>
-        \(body)
-        </body>
-        </html>
-        """
-    }
-}
-
-// MARK: - Flow Layout
-
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = FlowResult(in: proposal.width ?? 0, subviews: subviews, spacing: spacing)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = FlowResult(in: bounds.width, subviews: subviews, spacing: spacing)
-        for (index, subview) in subviews.enumerated() {
-            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x,
-                                      y: bounds.minY + result.positions[index].y),
-                         proposal: .unspecified)
-        }
-    }
-
-    struct FlowResult {
-        var size: CGSize = .zero
-        var positions: [CGPoint] = []
-
-        init(in maxWidth: CGFloat, subviews: Subviews, spacing: CGFloat) {
-            var x: CGFloat = 0
-            var y: CGFloat = 0
-            var rowHeight: CGFloat = 0
-
-            for subview in subviews {
-                let size = subview.sizeThatFits(.unspecified)
-
-                if x + size.width > maxWidth && x > 0 {
-                    x = 0
-                    y += rowHeight + spacing
-                    rowHeight = 0
-                }
-
-                positions.append(CGPoint(x: x, y: y))
-                rowHeight = max(rowHeight, size.height)
-                x += size.width + spacing
-            }
-
-            self.size = CGSize(width: maxWidth, height: y + rowHeight)
-        }
     }
 }
 
@@ -1092,3 +807,4 @@ struct FlowLayout: Layout {
         .environmentObject(AuthService.shared)
         .environmentObject(EmailManager.shared)
 }
+#endif

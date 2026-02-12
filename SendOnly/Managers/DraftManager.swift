@@ -95,6 +95,16 @@ final class DraftManager: ObservableObject {
         await deleteDraft()
     }
 
+    /// Delete a specific draft by ID and remove from local list
+    func deleteDraftById(_ draftId: String) async {
+        do {
+            try await gmailService.deleteDraft(draftId: draftId)
+            drafts.removeAll { $0.id == draftId }
+        } catch {
+            print("Failed to delete draft: \(error)")
+        }
+    }
+
     // MARK: - Clear State
 
     func clearDraft() {

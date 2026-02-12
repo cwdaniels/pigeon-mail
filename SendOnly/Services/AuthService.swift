@@ -1,6 +1,12 @@
 import Foundation
-import AppKit
 import CryptoKit
+
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+import AuthenticationServices
+#endif
 
 enum AuthError: Error, LocalizedError {
     case configurationMissing
@@ -55,11 +61,22 @@ final class AuthService: ObservableObject {
     private var clientId: String = ""
     private var clientSecret: String = ""
 
+    #if os(macOS)
     // Use loopback for Google Desktop OAuth
     private var redirectPort: UInt16 = 8089
     private var redirectURI: String {
         "http://127.0.0.1:\(redirectPort)"
     }
+    // Local server for OAuth callback
+    private var callbackServer: CallbackServer?
+    #elseif os(iOS)
+    // iOS uses reversed Google client ID as URL scheme
+    private static let iOSClientId = "625756953176-i51iif2paf25qp7nssb1fh6lb3t16njm.apps.googleusercontent.com"
+    private static let iOSCallbackScheme = "com.googleusercontent.apps.625756953176-i51iif2paf25qp7nssb1fh6lb3t16njm"
+    private var redirectURI: String {
+        "\(Self.iOSCallbackScheme):/oauth2callback"
+    }
+    #endif
 
     private let authorizationEndpoint = "https://accounts.google.com/o/oauth2/v2/auth"
     private let tokenEndpoint = "https://oauth2.googleapis.com/token"
@@ -76,9 +93,6 @@ final class AuthService: ObservableObject {
     // PKCE
     private var codeVerifier: String?
 
-    // Local server for OAuth callback
-    private var callbackServer: CallbackServer?
-
     private init() {
         loadConfiguration()
         loadStoredTokens()
@@ -87,7 +101,12 @@ final class AuthService: ObservableObject {
     // MARK: - Configuration
 
     private func loadConfiguration() {
-        // Try to load from credentials.json in bundle
+        #if os(iOS)
+        // iOS uses a dedicated iOS OAuth client (no client secret needed)
+        self.clientId = Self.iOSClientId
+        self.clientSecret = ""
+        #else
+        // macOS: load from credentials.json in bundle
         if let url = Bundle.main.url(forResource: "credentials", withExtension: "json"),
            let data = try? Data(contentsOf: url),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -100,6 +119,7 @@ final class AuthService: ObservableObject {
             clientId = UserDefaults.standard.string(forKey: "oauth_client_id") ?? ""
             clientSecret = UserDefaults.standard.string(forKey: "oauth_client_secret") ?? ""
         }
+        #endif
     }
 
     func configure(clientId: String, clientSecret: String = "") {
@@ -209,6 +229,17 @@ final class AuthService: ObservableObject {
         codeVerifier = generateCodeVerifier()
         let codeChallenge = generateCodeChallenge(from: codeVerifier!)
 
+        #if os(macOS)
+        try await signInMacOS(codeChallenge: codeChallenge)
+        #elseif os(iOS)
+        try await signInIOS(codeChallenge: codeChallenge)
+        #endif
+
+        await fetchUserInfo()
+    }
+
+    #if os(macOS)
+    private func signInMacOS(codeChallenge: String) async throws {
         // Start local server to receive callback
         let server = CallbackServer(port: redirectPort)
         callbackServer = server
@@ -254,9 +285,58 @@ final class AuthService: ObservableObject {
 
         // Exchange code for tokens
         try await exchangeCodeForTokens(code)
-
-        await fetchUserInfo()
     }
+    #endif
+
+    #if os(iOS)
+    private func signInIOS(codeChallenge: String) async throws {
+        // Build authorization URL
+        var components = URLComponents(string: authorizationEndpoint)!
+        components.queryItems = [
+            URLQueryItem(name: "client_id", value: clientId),
+            URLQueryItem(name: "redirect_uri", value: redirectURI),
+            URLQueryItem(name: "response_type", value: "code"),
+            URLQueryItem(name: "scope", value: scopes.joined(separator: " ")),
+            URLQueryItem(name: "code_challenge", value: codeChallenge),
+            URLQueryItem(name: "code_challenge_method", value: "S256"),
+            URLQueryItem(name: "access_type", value: "offline"),
+            URLQueryItem(name: "prompt", value: "consent")
+        ]
+
+        guard let authURL = components.url else {
+            throw AuthError.invalidURL
+        }
+
+        let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            let session = ASWebAuthenticationSession(
+                url: authURL,
+                callbackURLScheme: Self.iOSCallbackScheme
+            ) { callbackURL, error in
+                if let error = error {
+                    continuation.resume(throwing: AuthError.authenticationFailed(error.localizedDescription))
+                    return
+                }
+
+                guard let callbackURL = callbackURL,
+                      let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false),
+                      let code = components.queryItems?.first(where: { $0.name == "code" })?.value else {
+                    continuation.resume(throwing: AuthError.authenticationFailed("No authorization code received"))
+                    return
+                }
+
+                continuation.resume(returning: code)
+            }
+
+            let contextProvider = ASWebAuthPresentationContext()
+            session.presentationContextProvider = contextProvider
+            session.prefersEphemeralWebBrowserSession = false
+            session.start()
+        }
+
+        // Exchange code for tokens
+        try await exchangeCodeForTokens(code)
+    }
+    #endif
 
     private func exchangeCodeForTokens(_ code: String) async throws {
         guard let verifier = codeVerifier else {
@@ -354,8 +434,25 @@ final class AuthService: ObservableObject {
     }
 }
 
-// MARK: - Local Callback Server
+// MARK: - iOS ASWebAuthenticationSession Context
 
+#if os(iOS)
+class ASWebAuthPresentationContext: NSObject, ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        #if !EXTENSION
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            return window
+        }
+        #endif
+        return ASPresentationAnchor()
+    }
+}
+#endif
+
+// MARK: - Local Callback Server (macOS only)
+
+#if os(macOS)
 import Network
 
 class CallbackServer {
@@ -464,6 +561,7 @@ class CallbackServer {
         return code
     }
 }
+#endif
 
 // MARK: - Dictionary Extension
 

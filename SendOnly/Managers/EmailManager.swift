@@ -37,7 +37,7 @@ final class EmailManager: ObservableObject {
         }
 
         // Play send sound immediately when user hits send
-        HotkeyManager.shared.playSendSound()
+        SoundManager.shared.playSendSound()
 
         // Start undo countdown
         pendingEmail = currentEmail
@@ -91,21 +91,6 @@ final class EmailManager: ObservableObject {
         guard let email = pendingEmail else {
             sendState = .idle
             pendingEmailRecipient = nil
-            return
-        }
-
-        // Check network availability before attempting to send
-        if !NetworkMonitor.shared.isConnected {
-            OfflineQueueManager.shared.queueEmail(email)
-            sendState = .queued
-            pendingEmail = nil
-            pendingEmailRecipient = nil
-
-            // Reset to idle after showing queued state
-            Task {
-                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
-                sendState = .idle
-            }
             return
         }
 

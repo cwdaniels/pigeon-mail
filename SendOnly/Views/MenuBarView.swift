@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 import SwiftData
 
@@ -16,6 +17,10 @@ struct MenuBarView: View {
 
     @Query(sort: \QueuedEmail.queuedAt)
     private var allQueuedEmails: [QueuedEmail]
+
+    // Sent mail state
+    @State private var recentSent: [SentSummary] = []
+    @State private var pigeonsSentToday: Int = 0
 
     private var scheduledEmails: [ScheduledEmail] {
         allScheduledEmails.filter { $0.status == .pending }
@@ -59,6 +64,25 @@ struct MenuBarView: View {
                 Spacer()
             }
             .padding()
+
+            // Pigeon stats
+            HStack(spacing: 6) {
+                Image(systemName: "bird.fill")
+                    .font(.caption)
+                    .foregroundColor(.accentColor)
+                if pigeonsSentToday == 0 {
+                    Text("No pigeons sent yet today")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("\(pigeonsSentToday) pigeon\(pigeonsSentToday == 1 ? "" : "s") delivered today")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 4)
 
             Divider()
 
@@ -182,6 +206,9 @@ struct MenuBarView: View {
 
             // Drafts section
             draftsSection
+
+            // Recently sent section
+            sentSection
 
             // Scheduled emails section
             if !scheduledEmails.isEmpty {
@@ -362,6 +389,69 @@ struct MenuBarView: View {
         }
     }
 
+    // MARK: - Sent Section
+
+    private var sentSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Recently Sent")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+                .padding(.top, 4)
+
+            if recentSent.isEmpty {
+                Text("No sent emails")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
+            } else {
+                ForEach(recentSent.prefix(5)) { sent in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(sent.to)
+                                .lineLimit(1)
+                            Text(sent.subject)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+                }
+            }
+
+            Divider()
+                .padding(.vertical, 4)
+        }
+        .task {
+            await fetchSentMail()
+        }
+    }
+
+    private func fetchSentMail() async {
+        do {
+            let messages = try await GmailService.shared.listSentMessages(maxResults: 5)
+            var summaries: [SentSummary] = []
+            for item in messages {
+                if let metadata = try? await GmailService.shared.getMessage(messageId: item.id) {
+                    summaries.append(metadata.toSentSummary())
+                }
+            }
+            recentSent = summaries
+        } catch {
+            print("Failed to fetch sent messages: \(error)")
+        }
+
+        do {
+            pigeonsSentToday = try await GmailService.shared.countTodaySentMessages()
+        } catch {
+            print("Failed to count today's sent: \(error)")
+        }
+    }
+
     private func draftRow(_ draft: DraftSummary) -> some View {
         Button {
             loadDraft(draft.id)
@@ -514,3 +604,4 @@ struct MenuButtonStyle: ButtonStyle {
         .environmentObject(EmailManager.shared)
         .modelContainer(for: ScheduledEmail.self, inMemory: true)
 }
+#endif

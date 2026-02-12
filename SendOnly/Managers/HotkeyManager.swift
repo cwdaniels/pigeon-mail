@@ -1,4 +1,11 @@
 import Foundation
+
+// Notification name used by both platforms for navigation
+extension Notification.Name {
+    static let openComposeWindow = Notification.Name("openComposeWindow")
+}
+
+#if os(macOS)
 import Carbon
 import AppKit
 import Combine
@@ -20,7 +27,7 @@ final class HotkeyManager: ObservableObject {
         "Morse", "Ping", "Pop", "Purr", "Sosumi", "Submarine", "Tink"
     ]
 
-    // Default hotkey: ⌘⌥⇧M (Cmd+Option+Shift+M)
+    // Default hotkey: Cmd+Option+Shift+M
     var hotkeyModifiers: UInt32 {
         get { UInt32(UserDefaults.standard.integer(forKey: "hotkeyModifiers").nonZero ?? Int(cmdKey | optionKey | shiftKey)) }
         set { UserDefaults.standard.set(Int(newValue), forKey: "hotkeyModifiers") }
@@ -183,10 +190,10 @@ final class HotkeyManager: ObservableObject {
     var hotkeyDisplayString: String {
         var parts: [String] = []
 
-        if hotkeyModifiers & UInt32(controlKey) != 0 { parts.append("⌃") }
-        if hotkeyModifiers & UInt32(optionKey) != 0 { parts.append("⌥") }
-        if hotkeyModifiers & UInt32(shiftKey) != 0 { parts.append("⇧") }
-        if hotkeyModifiers & UInt32(cmdKey) != 0 { parts.append("⌘") }
+        if hotkeyModifiers & UInt32(controlKey) != 0 { parts.append("\u{2303}") }
+        if hotkeyModifiers & UInt32(optionKey) != 0 { parts.append("\u{2325}") }
+        if hotkeyModifiers & UInt32(shiftKey) != 0 { parts.append("\u{21E7}") }
+        if hotkeyModifiers & UInt32(cmdKey) != 0 { parts.append("\u{2318}") }
 
         parts.append(keyCodeToString(hotkeyKeyCode))
 
@@ -225,9 +232,4 @@ final class HotkeyManager: ObservableObject {
         }
     }
 }
-
-// MARK: - Notification Names
-
-extension Notification.Name {
-    static let openComposeWindow = Notification.Name("openComposeWindow")
-}
+#endif

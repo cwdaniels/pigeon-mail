@@ -37,6 +37,22 @@
 		A1000028 /* AppModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* AppModeManager.swift */; };
 		A1000029 /* FavoritesBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* FavoritesBarView.swift */; };
 		A1000030 /* DraftsDrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* DraftsDrawerView.swift */; };
+		A1000031 /* credentials.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000035 /* credentials.json */; };
+		A1000032 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000036 /* SoundManager.swift */; };
+		A1000033 /* PlatformHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000037 /* PlatformHelpers.swift */; };
+		A1000034 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000038 /* SharedComponents.swift */; };
+		A1000035 /* iOSMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000039 /* iOSMainView.swift */; };
+		A1000036 /* iOSComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000040 /* iOSComposeView.swift */; };
+		A1000037 /* iOSSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000041 /* iOSSettingsView.swift */; };
+		A1000038 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000044 /* ShareViewController.swift */; };
+		A1000039 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* KeychainService.swift */; };
+		A1000040 /* GmailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* GmailService.swift */; };
+		A1000041 /* Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* Email.swift */; };
+		A1000042 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* AuthService.swift */; };
+		A1000043 /* NetworkRetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* NetworkRetry.swift */; };
+		A1000044 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* NetworkMonitor.swift */; };
+		A1000045 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* Contact.swift */; };
+		A1000046 /* SendOnlyShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A2000045 /* SendOnlyShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,7 +63,28 @@
 			remoteGlobalIDString = A5000001;
 			remoteInfo = SendOnly;
 		};
+		A3000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A4000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A5000003;
+			remoteInfo = SendOnlyShare;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AC000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A1000046 /* SendOnlyShare.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A2000001 /* SendOnlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendOnlyApp.swift; sourceTree = "<group>"; };
@@ -84,6 +121,18 @@
 		A2000032 /* AppModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModeManager.swift; sourceTree = "<group>"; };
 		A2000033 /* FavoritesBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesBarView.swift; sourceTree = "<group>"; };
 		A2000034 /* DraftsDrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftsDrawerView.swift; sourceTree = "<group>"; };
+		A2000035 /* credentials.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = credentials.json; sourceTree = "<group>"; };
+		A2000036 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		A2000037 /* PlatformHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformHelpers.swift; sourceTree = "<group>"; };
+		A2000038 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
+		A2000039 /* iOSMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSMainView.swift; sourceTree = "<group>"; };
+		A2000040 /* iOSComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSComposeView.swift; sourceTree = "<group>"; };
+		A2000041 /* iOSSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSSettingsView.swift; sourceTree = "<group>"; };
+		A2000042 /* Info-iOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
+		A2000043 /* SendOnly-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "SendOnly-iOS.entitlements"; sourceTree = "<group>"; };
+		A2000044 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		A2000045 /* SendOnlyShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SendOnlyShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000046 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +150,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A6000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -108,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				A7000002 /* SendOnly */,
+				A7000010 /* SendOnlyShare */,
 				A7000007 /* SendOnlyTests */,
 				A7000008 /* Products */,
 			);
@@ -118,7 +175,9 @@
 			children = (
 				A2000001 /* SendOnlyApp.swift */,
 				A2000019 /* Info.plist */,
+				A2000042 /* Info-iOS.plist */,
 				A2000020 /* SendOnly.entitlements */,
+				A2000043 /* SendOnly-iOS.entitlements */,
 				A7000003 /* Views */,
 				A7000004 /* Models */,
 				A7000005 /* Services */,
@@ -138,6 +197,11 @@
 				A2000006 /* SettingsView.swift */,
 				A2000033 /* FavoritesBarView.swift */,
 				A2000034 /* DraftsDrawerView.swift */,
+				A2000037 /* PlatformHelpers.swift */,
+				A2000038 /* SharedComponents.swift */,
+				A2000039 /* iOSMainView.swift */,
+				A2000040 /* iOSComposeView.swift */,
+				A2000041 /* iOSSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -175,6 +239,7 @@
 				A2000026 /* OfflineQueueManager.swift */,
 				A2000031 /* FavoritesManager.swift */,
 				A2000032 /* AppModeManager.swift */,
+				A2000036 /* SoundManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -196,6 +261,7 @@
 			children = (
 				A2000021 /* SendOnly.app */,
 				A2000022 /* SendOnlyTests.xctest */,
+				A2000045 /* SendOnlyShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -204,8 +270,18 @@
 			isa = PBXGroup;
 			children = (
 				A2000017 /* Assets.xcassets */,
+				A2000035 /* credentials.json */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A7000010 /* SendOnlyShare */ = {
+			isa = PBXGroup;
+			children = (
+				A2000044 /* ShareViewController.swift */,
+				A2000046 /* Info.plist */,
+			);
+			path = SendOnlyShare;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,10 +294,12 @@
 				A9000001 /* Sources */,
 				A6000001 /* Frameworks */,
 				AA000001 /* Resources */,
+				AC000001 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A3000004 /* PBXTargetDependency */,
 			);
 			name = SendOnly;
 			productName = SendOnly;
@@ -245,6 +323,23 @@
 			productReference = A2000022 /* SendOnlyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		A5000003 /* SendOnlyShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A8000005 /* Build configuration list for PBXNativeTarget "SendOnlyShare" */;
+			buildPhases = (
+				A9000003 /* Sources */,
+				A6000003 /* Frameworks */,
+				AA000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SendOnlyShare;
+			productName = SendOnlyShare;
+			productReference = A2000045 /* SendOnlyShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -261,6 +356,9 @@
 					A5000002 = {
 						CreatedOnToolsVersion = 15.0;
 						TestTargetID = A5000001;
+					};
+					A5000003 = {
+						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
@@ -279,6 +377,7 @@
 			targets = (
 				A5000001 /* SendOnly */,
 				A5000002 /* SendOnlyTests */,
+				A5000003 /* SendOnlyShare */,
 			);
 		};
 /* End PBXProject section */
@@ -289,6 +388,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000017 /* Assets.xcassets in Resources */,
+				A1000031 /* credentials.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +430,12 @@
 				A1000028 /* AppModeManager.swift in Sources */,
 				A1000029 /* FavoritesBarView.swift in Sources */,
 				A1000030 /* DraftsDrawerView.swift in Sources */,
+				A1000032 /* SoundManager.swift in Sources */,
+				A1000033 /* PlatformHelpers.swift in Sources */,
+				A1000034 /* SharedComponents.swift in Sources */,
+				A1000035 /* iOSMainView.swift in Sources */,
+				A1000036 /* iOSComposeView.swift in Sources */,
+				A1000037 /* iOSSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +451,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000038 /* ShareViewController.swift in Sources */,
+				A1000039 /* KeychainService.swift in Sources */,
+				A1000040 /* GmailService.swift in Sources */,
+				A1000041 /* Email.swift in Sources */,
+				A1000042 /* AuthService.swift in Sources */,
+				A1000043 /* NetworkRetry.swift in Sources */,
+				A1000044 /* NetworkMonitor.swift in Sources */,
+				A1000045 /* Contact.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -345,6 +473,11 @@
 			isa = PBXTargetDependency;
 			target = A5000001 /* SendOnly */;
 			targetProxy = A3000001 /* PBXContainerItemProxy */;
+		};
+		A3000004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A5000003 /* SendOnlyShare */;
+			targetProxy = A3000003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -403,6 +536,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -463,6 +597,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -478,7 +613,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SendOnly/SendOnly.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "SendOnly/SendOnly-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "SendOnly/SendOnly-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = SendOnly/SendOnly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -488,18 +625,32 @@
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = SendOnly/Info.plist;
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "SendOnly/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "SendOnly/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = SendOnly/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				"LD_RUNPATH_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sendonly.app;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Pigeon Mail";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -508,7 +659,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SendOnly/SendOnly.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "SendOnly/SendOnly-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "SendOnly/SendOnly-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = SendOnly/SendOnly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -518,18 +671,32 @@
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = SendOnly/Info.plist;
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "SendOnly/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "SendOnly/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = SendOnly/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				"LD_RUNPATH_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sendonly.app;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Pigeon Mail";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -544,10 +711,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sendonly.app.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Pigeon Mail";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SendOnly.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SendOnly";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pigeon Mail.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pigeon Mail";
 			};
 			name = Debug;
 		};
@@ -562,10 +729,66 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sendonly.app.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Pigeon Mail";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SendOnly.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SendOnly";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pigeon Mail.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pigeon Mail";
+			};
+			name = Release;
+		};
+		AB000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SendOnlyShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pigeon Mail";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sendonly.app.share-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "EXTENSION $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AB000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SendOnlyShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pigeon Mail";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sendonly.app.share-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = EXTENSION;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -595,6 +818,15 @@
 			buildConfigurations = (
 				AB000005 /* Debug */,
 				AB000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A8000005 /* Build configuration list for PBXNativeTarget "SendOnlyShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB000007 /* Debug */,
+				AB000008 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

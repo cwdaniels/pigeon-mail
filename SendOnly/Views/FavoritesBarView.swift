@@ -21,7 +21,7 @@ struct FavoritesBarView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 6)
             }
-            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+            .background(Color.platformControlBackground.opacity(0.5))
         }
     }
 }

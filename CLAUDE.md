@@ -1,58 +1,69 @@
 # Pigeon Mail - Project Status
 
-**Version 2.0** | Last Updated: February 2, 2026
+**Version 3.0** | Last Updated: February 11, 2026
 
 ## Overview
-Pigeon Mail is a macOS menu bar email client for sending emails via Gmail. It's a SwiftUI app using SwiftData for persistence. Built with Claude Opus 4.5.
+Pigeon Mail is a multi-platform (macOS + iOS) email client for sending emails via Gmail. It's a SwiftUI app using SwiftData for persistence. Built with Claude Opus 4.5/4.6. The macOS version runs as a menu bar app; the iOS version is a standard NavigationStack-based app.
 
 ## Project Structure
 
 ```
 SendOnly/
 ├── SendOnly/
-│   ├── SendOnlyApp.swift          # Main app entry point, timer for scheduled emails
-│   ├── Info.plist
-│   ├── SendOnly.entitlements
+│   ├── SendOnlyApp.swift              # Main app entry point (#if os conditional scenes)
+│   ├── Info.plist                     # macOS Info.plist
+│   ├── Info-iOS.plist                 # iOS Info.plist (no LSUIElement/NSPrincipalClass)
+│   ├── SendOnly.entitlements          # macOS entitlements (includes network.server)
+│   ├── SendOnly-iOS.entitlements      # iOS entitlements (no network.server)
 │   ├── Views/
-│   │   ├── ComposeView.swift      # Email composition UI
-│   │   ├── MenuBarView.swift      # Menu bar dropdown UI
-│   │   ├── SchedulePickerView.swift
-│   │   ├── SettingsView.swift
-│   │   ├── UndoSendView.swift
-│   │   ├── DraftsDrawerView.swift # Slide-out drafts panel
-│   │   └── FavoritesBarView.swift # Quick-access favorites bar
-│   ├── Models/
-│   │   ├── Email.swift            # Email model + EmailSendState enum
-│   │   ├── Contact.swift          # Contact model with matchScore()
-│   │   ├── ScheduledEmail.swift   # SwiftData model for scheduled emails
-│   │   └── QueuedEmail.swift      # SwiftData model for offline queue
+│   │   ├── PlatformHelpers.swift      # Cross-platform Color extensions
+│   │   ├── SharedComponents.swift     # EmailChip, AttachmentChip, FlowLayout, InsertLinkView
+│   │   ├── ComposeView.swift          # macOS email composition UI (#if os(macOS))
+│   │   ├── MenuBarView.swift          # macOS menu bar dropdown (#if os(macOS))
+│   │   ├── SettingsView.swift         # macOS settings (#if os(macOS))
+│   │   ├── iOSMainView.swift          # iOS main navigation view (#if os(iOS))
+│   │   ├── iOSComposeView.swift       # iOS Form-based compose (#if os(iOS))
+│   │   ├── iOSSettingsView.swift      # iOS settings (#if os(iOS))
+│   │   ├── SchedulePickerView.swift   # Shared (cross-platform)
+│   │   ├── UndoSendView.swift         # Shared (cross-platform)
+│   │   ├── DraftsDrawerView.swift     # Shared (cross-platform)
+│   │   └── FavoritesBarView.swift     # Shared (cross-platform)
+│   ├── Models/                        # All models are platform-agnostic
+│   │   ├── Email.swift
+│   │   ├── Contact.swift
+│   │   ├── ScheduledEmail.swift
+│   │   └── QueuedEmail.swift
 │   ├── Services/
-│   │   ├── AuthService.swift      # Google OAuth 2.0 with PKCE
-│   │   ├── GmailService.swift     # Gmail API for sending
-│   │   ├── PeopleService.swift    # Google People API for contacts
-│   │   ├── KeychainService.swift  # Secure token storage
-│   │   ├── NetworkRetry.swift     # Retry wrapper with exponential backoff
-│   │   └── NetworkMonitor.swift   # NWPathMonitor connectivity tracking
+│   │   ├── AuthService.swift          # OAuth: macOS=CallbackServer, iOS=ASWebAuthenticationSession
+│   │   ├── GmailService.swift         # Platform-agnostic
+│   │   ├── PeopleService.swift        # Platform-agnostic
+│   │   ├── KeychainService.swift      # macOS=appSupport, iOS=documents dir
+│   │   ├── NetworkRetry.swift         # Platform-agnostic
+│   │   └── NetworkMonitor.swift       # Platform-agnostic
 │   ├── Managers/
-│   │   ├── EmailManager.swift     # Send state, scheduling, offline queue integration
-│   │   ├── DraftManager.swift     # Gmail draft management
-│   │   ├── HotkeyManager.swift    # Global hotkey registration + system sounds
-│   │   ├── OfflineQueueManager.swift  # Offline email queue processing
-│   │   ├── FavoritesManager.swift # Favorite contacts with pin/usage tracking
-│   │   └── AppModeManager.swift   # Dock/menu bar mode switching
+│   │   ├── EmailManager.swift         # Shared (uses SoundManager instead of HotkeyManager)
+│   │   ├── DraftManager.swift         # Platform-agnostic
+│   │   ├── SoundManager.swift         # Cross-platform sound: macOS=system sounds, iOS=haptic
+│   │   ├── HotkeyManager.swift        # macOS only (#if os(macOS)) + shared Notification.Name
+│   │   ├── OfflineQueueManager.swift  # Platform-agnostic
+│   │   ├── FavoritesManager.swift     # Platform-agnostic
+│   │   └── AppModeManager.swift       # macOS only (#if os(macOS))
 │   └── Resources/
-│       └── Assets.xcassets
-│           └── AppIcon.appiconset # Custom pigeon app icon
-├── SendOnlyTests/
-│   ├── SendOnlyTests.swift        # Original tests
-│   ├── NetworkRetryTests.swift    # Retry logic tests
-│   ├── ContactMatchingTests.swift # Contact scoring tests
-│   ├── ScheduledEmailTests.swift  # Scheduled email tests
-│   └── QueuedEmailTests.swift     # Queued email tests
+│       ├── Assets.xcassets
+│       │   └── AppIcon.appiconset     # macOS + iOS universal 1024x1024
+│       └── credentials.json
+├── SendOnlyShare/                     # iOS Share Extension
+│   └── ShareViewController.swift      # Simple compose form for sharing
+├── SendOnlyTests/                     # Platform-agnostic tests
+│   ├── SendOnlyTests.swift
+│   ├── NetworkRetryTests.swift
+│   ├── ContactMatchingTests.swift
+│   ├── ScheduledEmailTests.swift
+│   └── QueuedEmailTests.swift
 ├── SendOnly.xcodeproj/
-├── FEATURES.md                    # Feature documentation
-├── README.md                      # Setup instructions
-└── CLAUDE.md                      # This file
+├── FEATURES.md
+├── README.md
+└── CLAUDE.md
 ```
 
 ## Key Technical Details
@@ -103,35 +114,73 @@ SendOnly/
 - `showFavoritesBar` - Boolean toggle for favorites bar visibility
 - `appMode` - App mode: "menuBar", "dock", or "both"
 
-### AppModeManager
+### AppModeManager (macOS only)
 - Uses `NSApp.setActivationPolicy()` for dynamic switching
 - `.accessory` = menu bar only (hidden from dock)
 - `.regular` = shows in dock (used for "dock" and "both" modes)
 - Changes take effect immediately without restart
 
-### System Sound Playback
-- Uses `AudioToolbox` framework with `AudioServicesPlaySystemSound`
-- Works properly in sandboxed macOS apps
+### System Sound Playback (SoundManager)
+- Cross-platform singleton extracted from HotkeyManager
+- macOS: loads from `/System/Library/Sounds/`, uses `AudioServicesPlaySystemSound`, sound IDs cached
+- iOS: uses system sound ID 1001 + `UINotificationFeedbackGenerator` haptic
 - Sound plays immediately when user clicks send (before undo countdown)
-- Selectable from 13 built-in system sounds in Settings
-- Sound IDs are cached for performance
+- EmailManager now calls `SoundManager.shared.playSendSound()` instead of `HotkeyManager`
 
-### Global Hotkey
+### Global Hotkey (macOS only)
 - Default: Cmd+Option+Shift+M opens compose window
 - Uses Carbon `RegisterEventHotKey` API
-- Posts `.openComposeWindow` notification
+- Posts `.openComposeWindow` notification (defined outside `#if os(macOS)` for shared use)
 - MenuBarView observes notification and calls `openWindow(id: "compose")`
+
+### iOS Architecture
+- **iOSMainView**: NavigationStack with List showing undo status, queued emails, drafts, scheduled emails
+- **iOSComposeView**: Form-based layout with inline contact suggestions, keyboard toolbar for formatting
+- **iOSSettingsView**: Form with Account, Send Settings, Signature, Favorites, OAuth config, About
+- **OAuth on iOS**: Uses `ASWebAuthenticationSession` with custom URL scheme `com.sendonly.app:/oauth2callback`
+- **Token storage on iOS**: Uses `documentDirectory` instead of `applicationSupportDirectory`
+- **Attachments on iOS**: Uses `.fileImporter` (same as macOS, no NSOpenPanel)
+- **Share Extension**: `SendOnlyShare` target with simple compose form, reads tokens from shared keychain
+
+### Platform Compilation Strategy
+- `#if os(macOS)` wraps: ComposeView, MenuBarView, SettingsView, HotkeyManager, AppModeManager, CallbackServer
+- `#if os(iOS)` wraps: iOSMainView, iOSComposeView, iOSSettingsView, ASWebAuthPresentationContext, ShareViewController
+- Shared (no guard): Models, GmailService, PeopleService, NetworkMonitor, NetworkRetry, DraftManager, OfflineQueueManager, FavoritesManager, EmailManager, SoundManager, PlatformHelpers, SharedComponents, SchedulePickerView, UndoSendView, DraftsDrawerView, FavoritesBarView
 
 ## Bundle Identifiers
 - App: `com.sendonly.app`
 - Tests: `com.sendonly.app.tests`
+- Share Extension: `com.sendonly.app.share-extension`
 
 ## Requirements
-- macOS 14.0+
+- macOS 14.0+ / iOS 17.0+
 - Xcode 15+
 - Google Cloud OAuth credentials
 
-## Recent Changes (Feb 2026) - Version 2.0
+## Recent Changes (Feb 11, 2026) - Version 3.0 (iOS Port)
+- **iOS Support**: Added iPhone destination to the SendOnly target
+  - `iOSMainView` with NavigationStack, list of drafts/scheduled/queued emails
+  - `iOSComposeView` with Form-based layout, keyboard toolbar, file importer
+  - `iOSSettingsView` with Account, Send Settings, Signature, Favorites, OAuth, About
+  - `ASWebAuthenticationSession` for OAuth on iOS (replaces local callback server)
+  - `SoundManager` cross-platform singleton for send sounds
+  - `PlatformHelpers` for cross-platform Color extensions
+  - `SharedComponents` for EmailChip, AttachmentChip, FlowLayout, InsertLinkView
+  - Share Extension (`SendOnlyShare`) for composing from other apps
+- **Platform Guards**: macOS-only views wrapped in `#if os(macOS)`, iOS views in `#if os(iOS)`
+- **NSColor removal**: All shared views now use `Color.platformWindowBackground` etc.
+- **KeychainService**: iOS uses `documentDirectory` for token file storage
+- **AppIcon**: Added iOS universal 1024x1024 entry reusing existing icon
+- New files: `Info-iOS.plist`, `SendOnly-iOS.entitlements`
+
+## Changes (Feb 9, 2026) - Version 2.1
+- **Bundled OAuth credentials**: `credentials.json` added to app bundle Resources and Xcode project
+  - OAuth config now survives app re-signing and sandbox container resets
+  - Previously relied on UserDefaults which was lost when code signing identity changed
+  - AuthService loads from bundle first, falls back to UserDefaults for manual entry
+- **Build/export fix**: App was previously exported as a Debug build with `__preview.dylib` and `SendOnly.debug.dylib` in the bundle, causing Gatekeeper rejection. Future builds should use Product > Archive for proper Release export.
+
+## Changes (Feb 2, 2026) - Version 2.0
 - **Favorites Bar**: Quick-access bar in compose window showing top 5 contacts
   - Pin/unpin via context menu, pinned contacts appear first
   - Usage tracked automatically after successful sends

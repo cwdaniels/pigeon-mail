@@ -40,7 +40,9 @@ final class NetworkMonitor: ObservableObject {
     }
 
     private func handlePathUpdate(_ path: NWPath) {
-        let newIsConnected = path.status == .satisfied
+        // .satisfied = fully connected, .requiresConnection = available but needs activation
+        // Both states allow network requests on iOS
+        let newIsConnected = path.status == .satisfied || path.status == .requiresConnection
         let previouslyConnected = isConnected
 
         isConnected = newIsConnected

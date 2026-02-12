@@ -30,10 +30,16 @@ final class KeychainService {
     private let fileManager = FileManager.default
 
     private var tokenFileURL: URL? {
-        guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+        #if os(macOS)
+        guard let baseDir = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             return nil
         }
-        let appFolder = appSupport.appendingPathComponent("SendOnly", isDirectory: true)
+        #elseif os(iOS)
+        guard let baseDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        #endif
+        let appFolder = baseDir.appendingPathComponent("SendOnly", isDirectory: true)
 
         // Create directory if needed
         if !fileManager.fileExists(atPath: appFolder.path) {

@@ -252,6 +252,81 @@ final class GmailService {
         return try JSONDecoder().decode(DraftDetail.self, from: data)
     }
 
+    // MARK: - Sent Messages
+
+    func listSentMessages(maxResults: Int = 5) async throws -> [MessageListItem] {
+        let token = try await authService.getAccessToken()
+
+        let url = URL(string: "\(baseURL)/messages?labelIds=SENT&maxResults=\(maxResults)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GmailError.invalidResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = parseErrorMessage(from: data)
+            throw GmailError.apiError(httpResponse.statusCode, errorMessage)
+        }
+
+        let listResponse = try JSONDecoder().decode(MessageListResponse.self, from: data)
+        return listResponse.messages ?? []
+    }
+
+    func getMessage(messageId: String) async throws -> MessageMetadata {
+        let token = try await authService.getAccessToken()
+
+        let url = URL(string: "\(baseURL)/messages/\(messageId)?format=metadata&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GmailError.invalidResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = parseErrorMessage(from: data)
+            throw GmailError.apiError(httpResponse.statusCode, errorMessage)
+        }
+
+        return try JSONDecoder().decode(MessageMetadata.self, from: data)
+    }
+
+    func countTodaySentMessages() async throws -> Int {
+        let token = try await authService.getAccessToken()
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        let today = formatter.string(from: Date())
+
+        let query = "after:\(today)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "after:\(today)"
+        let url = URL(string: "\(baseURL)/messages?labelIds=SENT&q=\(query)&maxResults=1")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GmailError.invalidResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = parseErrorMessage(from: data)
+            throw GmailError.apiError(httpResponse.statusCode, errorMessage)
+        }
+
+        let listResponse = try JSONDecoder().decode(MessageListResponse.self, from: data)
+        return listResponse.resultSizeEstimate ?? 0
+    }
+
     // MARK: - Helpers
 
     private func parseErrorMessage(from data: Data) -> String {
@@ -426,4 +501,61 @@ struct MessagePart: Codable {
     let mimeType: String?
     let body: MessageBody?
     let parts: [MessagePart]?
+}
+
+// MARK: - Sent Message Models
+
+struct MessageListResponse: Codable {
+    let messages: [MessageListItem]?
+    let nextPageToken: String?
+    let resultSizeEstimate: Int?
+}
+
+struct MessageListItem: Codable, Identifiable {
+    let id: String
+    let threadId: String?
+}
+
+struct MessageMetadata: Codable {
+    let id: String
+    let payload: MessagePayload?
+
+    func toSentSummary() -> SentSummary {
+        var to = "(No recipient)"
+        var subject = "(No subject)"
+        var date: Date?
+
+        if let headers = payload?.headers {
+            for header in headers {
+                switch header.name.lowercased() {
+                case "to":
+                    // Extract just the email or first name
+                    let value = header.value
+                    if let start = value.range(of: "<"),
+                       let end = value.range(of: ">") {
+                        to = String(value[start.upperBound..<end.lowerBound])
+                    } else {
+                        to = value.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? value
+                    }
+                case "subject":
+                    subject = header.value.isEmpty ? "(No subject)" : header.value
+                case "date":
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+                    date = formatter.date(from: header.value)
+                default:
+                    break
+                }
+            }
+        }
+
+        return SentSummary(id: id, to: to, subject: subject, date: date)
+    }
+}
+
+struct SentSummary: Identifiable {
+    let id: String
+    let to: String
+    let subject: String
+    let date: Date?
 }

@@ -93,8 +93,10 @@ struct DraftsDrawerView: View {
             }
             .padding()
         }
+        #if os(macOS)
         .frame(width: 250)
-        .background(Color(NSColor.windowBackgroundColor))
+        #endif
+        .background(Color.platformWindowBackground)
         .task {
             // Only fetch if we don't have cached drafts
             if draftManager.drafts.isEmpty {

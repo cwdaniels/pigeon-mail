@@ -2,43 +2,78 @@ name: SendOnly
 options:
   bundleIdPrefix: com.sendonly
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
+    iOS: "17.0"
   xcodeVersion: "15.0"
   generateEmptyDirectories: true
 
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""  # Fill in your team ID
 
 targets:
   SendOnly:
     type: application
-    platform: macOS
+    platform: [macOS, iOS]
+    settings:
+      base:
+        PRODUCT_NAME: "Pigeon Mail"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator macosx"
+        SUPPORTS_MACCATALYST: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
     sources:
       - path: SendOnly
         excludes:
           - "**/*.xcassets"
+          - "**/credentials.json"
       - path: SendOnly/Resources/Assets.xcassets
         type: folder
+    resources:
+      - path: SendOnly/Resources/credentials.json
+        optional: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app
-        INFOPLIST_FILE: SendOnly/Info.plist
-        CODE_SIGN_ENTITLEMENTS: SendOnly/SendOnly.entitlements
-        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+        GENERATE_INFOPLIST_FILE: NO
+        "INFOPLIST_FILE[sdk=macosx*]": SendOnly/Info.plist
+        "INFOPLIST_FILE[sdk=iphoneos*]": SendOnly/Info-iOS.plist
+        "INFOPLIST_FILE[sdk=iphonesimulator*]": SendOnly/Info-iOS.plist
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": SendOnly/SendOnly.entitlements
+        "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]": SendOnly/SendOnly-iOS.entitlements
+        "CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]": SendOnly/SendOnly-iOS.entitlements
+        "LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]": "$(inherited) @executable_path/../Frameworks"
+        "LD_RUNPATH_SEARCH_PATHS[sdk=iphoneos*]": "$(inherited) @executable_path/Frameworks"
+        "LD_RUNPATH_SEARCH_PATHS[sdk=iphonesimulator*]": "$(inherited) @executable_path/Frameworks"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_PREVIEWS: YES
-    entitlements:
-      path: SendOnly/SendOnly.entitlements
-      properties:
-        com.apple.security.app-sandbox: true
-        com.apple.security.network.client: true
-        keychain-access-groups:
-          - $(AppIdentifierPrefix)com.sendonly.app
+    dependencies:
+      - target: SendOnlyShare
+
+  SendOnlyShare:
+    type: app-extension
+    platform: iOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app.share-extension
+        INFOPLIST_FILE: SendOnlyShare/Info.plist
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+    sources:
+      - path: SendOnlyShare
+      - path: SendOnly/Services/KeychainService.swift
+      - path: SendOnly/Services/GmailService.swift
+      - path: SendOnly/Services/AuthService.swift
+      - path: SendOnly/Services/NetworkRetry.swift
+      - path: SendOnly/Services/NetworkMonitor.swift
+      - path: SendOnly/Models/Email.swift
+      - path: SendOnly/Models/Contact.swift
 
   SendOnlyTests:
     type: bundle.unit-test
@@ -50,7 +85,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app.tests
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SendOnly.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SendOnly"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Pigeon Mail.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pigeon Mail"
         BUNDLE_LOADER: "$(TEST_HOST)"
 
 schemes:
@@ -59,6 +94,7 @@ schemes:
       targets:
         SendOnly: all
         SendOnlyTests: [test]
+        SendOnlyShare: all
     run:
       config: Debug
     test:

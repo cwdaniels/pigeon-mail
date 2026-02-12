@@ -99,7 +99,9 @@ struct SchedulePickerView: View {
             }
         }
         .padding()
+        #if os(macOS)
         .frame(width: 350, height: 400)
+        #endif
     }
 
     private var formattedDate: String {
@@ -219,7 +221,7 @@ struct PresetButton: View {
                 Spacer()
             }
             .padding(10)
-            .background(isSelected ? Color.accentColor.opacity(0.2) : Color(NSColor.controlBackgroundColor))
+            .background(isSelected ? Color.accentColor.opacity(0.2) : Color.platformControlBackground)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
