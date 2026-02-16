@@ -28,63 +28,124 @@ final class KeychainService {
     static let shared = KeychainService()
 
     private let fileManager = FileManager.default
+    private let keychainService = "com.sendonly.app.tokens"
+    private let keychainAccount = "oauth-tokens"
 
+    #if os(macOS)
     private var tokenFileURL: URL? {
-        #if os(macOS)
         guard let baseDir = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             return nil
         }
-        #elseif os(iOS)
-        guard let baseDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return nil
-        }
-        #endif
         let appFolder = baseDir.appendingPathComponent("SendOnly", isDirectory: true)
 
-        // Create directory if needed
         if !fileManager.fileExists(atPath: appFolder.path) {
             try? fileManager.createDirectory(at: appFolder, withIntermediateDirectories: true)
         }
 
         return appFolder.appendingPathComponent("tokens.json")
     }
+    #endif
 
     private init() {}
 
     // MARK: - Token Storage
 
     func saveTokens(_ tokens: OAuthTokens) throws {
+        let data = try JSONEncoder().encode(tokens)
+
+        #if os(iOS)
+        try saveToKeychain(data)
+        #else
         guard let fileURL = tokenFileURL else {
             throw KeychainError.fileError("Could not get token file URL")
         }
-
-        let data = try JSONEncoder().encode(tokens)
         try data.write(to: fileURL, options: .atomic)
+        #endif
     }
 
     func loadTokens() throws -> OAuthTokens {
+        #if os(iOS)
+        let data = try loadFromKeychain()
+        return try JSONDecoder().decode(OAuthTokens.self, from: data)
+        #else
         guard let fileURL = tokenFileURL else {
             throw KeychainError.fileError("Could not get token file URL")
         }
-
         guard fileManager.fileExists(atPath: fileURL.path) else {
             throw KeychainError.itemNotFound
         }
-
         let data = try Data(contentsOf: fileURL)
-        let tokens = try JSONDecoder().decode(OAuthTokens.self, from: data)
-        return tokens
+        return try JSONDecoder().decode(OAuthTokens.self, from: data)
+        #endif
     }
 
     func deleteTokens() throws {
+        #if os(iOS)
+        deleteFromKeychain()
+        #else
         guard let fileURL = tokenFileURL else {
             return
         }
-
         if fileManager.fileExists(atPath: fileURL.path) {
             try fileManager.removeItem(at: fileURL)
         }
+        #endif
     }
+
+    // MARK: - iOS Keychain Operations
+
+    #if os(iOS)
+    private func saveToKeychain(_ data: Data) throws {
+        // Delete existing item first
+        deleteFromKeychain()
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw KeychainError.unexpectedStatus(status)
+        }
+    }
+
+    private func loadFromKeychain() throws -> Data {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        guard status == errSecSuccess else {
+            throw KeychainError.itemNotFound
+        }
+
+        guard let data = result as? Data else {
+            throw KeychainError.invalidData
+        }
+
+        return data
+    }
+
+    private func deleteFromKeychain() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount
+        ]
+
+        SecItemDelete(query as CFDictionary)
+    }
+    #endif
 }
 
 // MARK: - OAuth Tokens Model
