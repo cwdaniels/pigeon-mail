@@ -1,6 +1,6 @@
 # Pigeon Mail
 
-A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pigeon Mail lives in your menu bar and lets you compose and send emails quickly without the overhead of a full email client.
+A fast, lightweight email client for sending emails via Gmail. On macOS, Pigeon Mail lives in your menu bar. On iOS, it opens straight to compose. Send emails quickly without the overhead of a full email client.
 
 ## Core Features
 
@@ -131,10 +131,16 @@ A fast, lightweight macOS menu bar email client for sending emails via Gmail. Pi
 - Re-register global hotkey
 - Open accessibility settings
 
+### Lock Screen Widget (iOS)
+- Circular widget with bird icon for the iOS Lock Screen
+- Inline widget showing "Compose" label
+- Tap to launch directly into compose via `sendonly://compose` deep link
+
 ## Technical Details
 
 - Built with SwiftUI and SwiftData
-- macOS 14.0+ required
+- macOS 14.0+ / iOS 17.0+ required
 - Uses Gmail API for sending
 - Uses Google People API for contacts
 - Persistent storage for scheduled and queued emails
+- XcodeGen (`project.yml`) for project generation

@@ -12,6 +12,7 @@ struct iOSMainView: View {
 
     @State private var showCompose = false
     @State private var showSettings = false
+    @Environment(\.scenePhase) private var scenePhase
 
     // Sent mail state
     @State private var recentSent: [SentSummary] = []
@@ -304,6 +305,16 @@ struct iOSMainView: View {
             await fetchSentMail()
         }
         .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showCompose = true
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active && authService.isAuthenticated {
+                showCompose = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openComposeFromWidget)) { _ in
             showCompose = true
         }
     }

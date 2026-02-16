@@ -2,6 +2,10 @@ import SwiftUI
 import SwiftData
 import Combine
 
+extension Notification.Name {
+    static let openComposeFromWidget = Notification.Name("openComposeFromWidget")
+}
+
 @main
 struct PigeonMailApp: App {
     @StateObject private var authService = AuthService.shared
@@ -80,6 +84,11 @@ struct PigeonMailApp: App {
                 .modelContainer(sharedModelContainer)
                 .onReceive(scheduledEmailTimer) { _ in
                     processScheduledEmails()
+                }
+                .onOpenURL { url in
+                    if url.scheme == "sendonly" && url.host == "compose" {
+                        NotificationCenter.default.post(name: .openComposeFromWidget, object: nil)
+                    }
                 }
         }
         #endif

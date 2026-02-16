@@ -18,13 +18,7 @@ settings:
 targets:
   SendOnly:
     type: application
-    platform: [macOS, iOS]
-    settings:
-      base:
-        PRODUCT_NAME: "Pigeon Mail"
-        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator macosx"
-        SUPPORTS_MACCATALYST: NO
-        TARGETED_DEVICE_FAMILY: "1,2"
+    supportedDestinations: [macOS, iOS]
     sources:
       - path: SendOnly
         excludes:
@@ -37,6 +31,10 @@ targets:
         optional: true
     settings:
       base:
+        PRODUCT_NAME: "Pigeon Mail"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator macosx"
+        SUPPORTS_MACCATALYST: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
         PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app
         GENERATE_INFOPLIST_FILE: NO
         "INFOPLIST_FILE[sdk=macosx*]": SendOnly/Info.plist
@@ -53,12 +51,31 @@ targets:
         ENABLE_PREVIEWS: YES
     dependencies:
       - target: SendOnlyShare
+      - target: SendOnlyWidget
+
+  SendOnlyWidget:
+    type: app-extension
+    platform: iOS
+    settings:
+      base:
+        PRODUCT_NAME: SendOnlyWidget
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: EXTENSION
+        PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app.widget
+        INFOPLIST_FILE: SendOnlyWidget/Info.plist
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+    sources:
+      - path: SendOnlyWidget
 
   SendOnlyShare:
     type: app-extension
     platform: iOS
     settings:
       base:
+        PRODUCT_NAME: SendOnlyShare
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: EXTENSION
         PRODUCT_BUNDLE_IDENTIFIER: com.sendonly.app.share-extension
         INFOPLIST_FILE: SendOnlyShare/Info.plist
         SKIP_INSTALL: YES
@@ -95,6 +112,7 @@ schemes:
         SendOnly: all
         SendOnlyTests: [test]
         SendOnlyShare: all
+        SendOnlyWidget: all
     run:
       config: Debug
     test:

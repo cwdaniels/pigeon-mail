@@ -1,6 +1,6 @@
 # Pigeon Mail - Project Status
 
-**Version 3.0** | Last Updated: February 11, 2026
+**Version 3.1** | Last Updated: February 16, 2026
 
 ## Overview
 Pigeon Mail is a multi-platform (macOS + iOS) email client for sending emails via Gmail. It's a SwiftUI app using SwiftData for persistence. Built with Claude Opus 4.5/4.6. The macOS version runs as a menu bar app; the iOS version is a standard NavigationStack-based app.
@@ -50,8 +50,11 @@ SendOnly/
 │   │   └── AppModeManager.swift       # macOS only (#if os(macOS))
 │   └── Resources/
 │       ├── Assets.xcassets
-│       │   └── AppIcon.appiconset     # macOS + iOS universal 1024x1024
+│       │   └── AppIcon.appiconset     # Blue bird.fill icon, macOS + iOS universal 1024x1024
 │       └── credentials.json
+├── SendOnlyWidget/                    # iOS Lock Screen Widget Extension
+│   ├── SendOnlyWidget.swift           # Static widget: accessoryCircular + accessoryInline
+│   └── Info.plist                     # Widget extension plist
 ├── SendOnlyShare/                     # iOS Share Extension
 │   └── ShareViewController.swift      # Simple compose form for sharing
 ├── SendOnlyTests/                     # Platform-agnostic tests
@@ -141,23 +144,58 @@ SendOnly/
 - **Token storage on iOS**: Uses `documentDirectory` instead of `applicationSupportDirectory`
 - **Attachments on iOS**: Uses `.fileImporter` (same as macOS, no NSOpenPanel)
 - **Share Extension**: `SendOnlyShare` target with simple compose form, reads tokens from shared keychain
+- **Lock Screen Widget**: `SendOnlyWidget` target with `accessoryCircular` (bird icon) and `accessoryInline` families
+  - Static widget (no dynamic data), `.never` refresh policy
+  - Deep-links to compose via `sendonly://compose` URL scheme
+- **Deep Link Handling**: `.onOpenURL` in `SendOnlyApp.swift` posts `.openComposeFromWidget` notification
+  - `iOSMainView` receives notification and opens compose sheet
 
 ### Platform Compilation Strategy
 - `#if os(macOS)` wraps: ComposeView, MenuBarView, SettingsView, HotkeyManager, AppModeManager, CallbackServer
 - `#if os(iOS)` wraps: iOSMainView, iOSComposeView, iOSSettingsView, ASWebAuthPresentationContext, ShareViewController
 - Shared (no guard): Models, GmailService, PeopleService, NetworkMonitor, NetworkRetry, DraftManager, OfflineQueueManager, FavoritesManager, EmailManager, SoundManager, PlatformHelpers, SharedComponents, SchedulePickerView, UndoSendView, DraftsDrawerView, FavoritesBarView
 
+### Notification Names
+- `.openComposeWindow` — macOS global hotkey triggers compose window (HotkeyManager)
+- `.openComposeFromWidget` — `sendonly://compose` deep link triggers iOS compose sheet (SendOnlyApp)
+- `.networkBecameAvailable` / `.networkBecameUnavailable` — network status changes (NetworkMonitor)
+- `.emailQueued` — email added to offline queue (OfflineQueueManager)
+
+### Extension Build Flags
+- Both `SendOnlyShare` and `SendOnlyWidget` targets define `SWIFT_ACTIVE_COMPILATION_CONDITIONS: EXTENSION`
+- Code guarded with `#if !EXTENSION` (e.g., `UIApplication.shared` in `AuthService.swift`)
+
 ## Bundle Identifiers
 - App: `com.sendonly.app`
 - Tests: `com.sendonly.app.tests`
 - Share Extension: `com.sendonly.app.share-extension`
+- Widget Extension: `com.sendonly.app.widget`
 
 ## Requirements
 - macOS 14.0+ / iOS 17.0+
 - Xcode 15+
 - Google Cloud OAuth credentials
 
-## Recent Changes (Feb 11, 2026) - Version 3.0 (iOS Port)
+## Recent Changes (Feb 16, 2026) - Version 3.1 (Widget + Icon)
+- **Lock Screen Widget**: New `SendOnlyWidget` extension target
+  - `accessoryCircular`: bird icon on `AccessoryWidgetBackground`, `.widgetAccentable()`
+  - `accessoryInline`: "Compose" label with bird icon
+  - Deep-links to compose via `sendonly://compose` URL scheme
+  - Static configuration with `.never` refresh policy
+- **Deep Link Handling**: `sendonly://` URL scheme (already registered in `Info-iOS.plist`) now handled
+  - `.onOpenURL` in `SendOnlyApp.swift` posts `.openComposeFromWidget` notification
+  - `iOSMainView` receives notification and opens compose sheet
+- **New App Icon**: Replaced cartoon pigeon with blue `bird.fill` SF Symbol
+  - AccentColor blue `rgb(0.275, 0.459, 0.898)` on white background
+  - Bird sized at 55% of icon dimensions, centered
+  - All 10 macOS sizes + iOS 1024x1024 universal regenerated
+- **XcodeGen Fixes**:
+  - `platform: [macOS, iOS]` updated to `supportedDestinations: [macOS, iOS]` for XcodeGen 2.44 compatibility
+  - Merged duplicate `settings:` blocks in `SendOnly` target (YAML was silently discarding the first)
+  - Added `PRODUCT_NAME` to extension targets to prevent output path conflicts
+  - Added `SWIFT_ACTIVE_COMPILATION_CONDITIONS: EXTENSION` to both extension targets
+
+## Changes (Feb 11, 2026) - Version 3.0 (iOS Port)
 - **iOS Support**: Added iPhone destination to the SendOnly target
   - `iOSMainView` with NavigationStack, list of drafts/scheduled/queued emails
   - `iOSComposeView` with Form-based layout, keyboard toolbar, file importer
