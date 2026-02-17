@@ -21,30 +21,14 @@ struct Provider: TimelineProvider {
 }
 
 struct SendOnlyWidgetEntryView: View {
-    var entry: Provider.Entry
-
     var body: some View {
-        #if os(iOS)
-        @Environment(\.widgetFamily) var family
-        switch family {
-        case .accessoryCircular:
-            circularView
-        case .accessoryInline:
-            Label("Compose", systemImage: "envelope")
-        default:
-            circularView
-        }
-        #else
-        circularView
-        #endif
-    }
-
-    private var circularView: some View {
         ZStack {
             AccessoryWidgetBackground()
-            Text("\u{1F54A}\u{FE0F}")
-                .font(.system(size: 24))
+            Image(systemName: "bird.fill")
+                .font(.system(size: 20))
+                .widgetAccentable()
         }
+        .containerBackground(for: .widget) {}
     }
 }
 
@@ -54,7 +38,7 @@ struct SendOnlyWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            SendOnlyWidgetEntryView(entry: entry)
+            SendOnlyWidgetEntryView()
                 .widgetURL(URL(string: "sendonly://compose"))
         }
         .configurationDisplayName("Pigeon Mail")
