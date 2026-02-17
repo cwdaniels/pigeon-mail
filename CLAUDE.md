@@ -147,6 +147,7 @@ SendOnly/
 - **Lock Screen Widget**: `SendOnlyWidget` target with `accessoryCircular` (bird icon) and `accessoryInline` families
   - Static widget (no dynamic data), `.never` refresh policy
   - Deep-links to compose via `sendonly://compose` URL scheme
+  - Requires `.containerBackground(for: .widget) {}` — iOS 17+ crashes without it
 - **Deep Link Handling**: `.onOpenURL` in `SendOnlyApp.swift` posts `.openComposeFromWidget` notification
   - `iOSMainView` receives notification and opens compose sheet
 
