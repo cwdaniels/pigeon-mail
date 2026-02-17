@@ -12,6 +12,8 @@ settings:
     SWIFT_VERSION: "5.9"
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    MARKETING_VERSION: "3.1"
+    CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""  # Fill in your team ID
 
@@ -25,7 +27,6 @@ targets:
           - "**/*.xcassets"
           - "**/credentials.json"
       - path: SendOnly/Resources/Assets.xcassets
-        type: folder
     resources:
       - path: SendOnly/Resources/credentials.json
         optional: true

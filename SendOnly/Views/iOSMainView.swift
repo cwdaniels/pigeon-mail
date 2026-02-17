@@ -317,6 +317,12 @@ struct iOSMainView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openComposeFromWidget)) { _ in
             showCompose = true
         }
+        .onChange(of: emailManager.sendState) { _, newState in
+            if newState == .sent {
+                pigeonsSentToday += 1
+                Task { await fetchSentMail() }
+            }
+        }
     }
 
     // MARK: - Sign In View

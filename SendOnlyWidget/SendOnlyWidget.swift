@@ -30,7 +30,7 @@ struct SendOnlyWidgetEntryView: View {
         case .accessoryCircular:
             circularView
         case .accessoryInline:
-            Label("Compose", systemImage: "bird.fill")
+            Label("Compose", systemImage: "envelope")
         default:
             circularView
         }
@@ -42,9 +42,8 @@ struct SendOnlyWidgetEntryView: View {
     private var circularView: some View {
         ZStack {
             AccessoryWidgetBackground()
-            Image(systemName: "bird.fill")
-                .font(.title2)
-                .widgetAccentable()
+            Text("\u{1F54A}\u{FE0F}")
+                .font(.system(size: 24))
         }
     }
 }

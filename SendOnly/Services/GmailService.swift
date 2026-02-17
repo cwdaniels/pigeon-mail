@@ -307,7 +307,7 @@ final class GmailService {
         let today = formatter.string(from: Date())
 
         let query = "after:\(today)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "after:\(today)"
-        let url = URL(string: "\(baseURL)/messages?labelIds=SENT&q=\(query)&maxResults=1")!
+        let url = URL(string: "\(baseURL)/messages?labelIds=SENT&q=\(query)&maxResults=100")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -324,7 +324,7 @@ final class GmailService {
         }
 
         let listResponse = try JSONDecoder().decode(MessageListResponse.self, from: data)
-        return listResponse.resultSizeEstimate ?? 0
+        return listResponse.messages?.count ?? 0
     }
 
     // MARK: - Helpers
