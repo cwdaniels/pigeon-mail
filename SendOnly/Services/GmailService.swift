@@ -35,6 +35,7 @@ enum GmailError: Error, LocalizedError, RetryableError {
     }
 }
 
+@MainActor
 final class GmailService {
     static let shared = GmailService()
 
@@ -53,7 +54,7 @@ final class GmailService {
 
     private func performSendEmail(_ email: Email) async throws -> SendResponse {
         let token = try await authService.getAccessToken()
-        let fromAddress = await authService.formattedFromAddress
+        let fromAddress = authService.formattedFromAddress
         guard !fromAddress.isEmpty else {
             throw GmailError.notAuthenticated
         }
@@ -103,7 +104,7 @@ final class GmailService {
 
     private func performCreateDraft(_ email: Email) async throws -> DraftResponse {
         let token = try await authService.getAccessToken()
-        guard let userEmail = await authService.userEmail else {
+        guard let userEmail = authService.userEmail else {
             throw GmailError.notAuthenticated
         }
 
@@ -148,7 +149,7 @@ final class GmailService {
 
     private func performUpdateDraft(draftId: String, email: Email) async throws -> DraftResponse {
         let token = try await authService.getAccessToken()
-        guard let userEmail = await authService.userEmail else {
+        guard let userEmail = authService.userEmail else {
             throw GmailError.notAuthenticated
         }
 

@@ -14,6 +14,7 @@ enum AuthError: Error, LocalizedError {
     case authenticationFailed(String)
     case tokenExchangeFailed(String)
     case noRefreshToken
+    case sessionExpired
     case networkError(Error)
     case serverError(String)
 
@@ -29,6 +30,8 @@ enum AuthError: Error, LocalizedError {
             return "Token exchange failed: \(message)"
         case .noRefreshToken:
             return "No refresh token available"
+        case .sessionExpired:
+            return "Your session expired. Please sign in again to keep sending."
         case .networkError(let error):
             return "Network error: \(error.localizedDescription)"
         case .serverError(let message):
@@ -189,6 +192,13 @@ final class AuthService: ObservableObject {
 
             guard httpResponse.statusCode == 200 else {
                 let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
+                // An expired or revoked refresh token comes back as "invalid_grant".
+                // The stored tokens are dead, so clear them and prompt a fresh sign-in
+                // instead of surfacing a cryptic "Bad Request".
+                if errorBody.contains("invalid_grant") {
+                    signOut()
+                    throw AuthError.sessionExpired
+                }
                 throw AuthError.tokenExchangeFailed("Status \(httpResponse.statusCode): \(errorBody)")
             }
 
@@ -455,7 +465,8 @@ class ASWebAuthPresentationContext: NSObject, ASWebAuthenticationPresentationCon
 #if os(macOS)
 import Network
 
-class CallbackServer {
+// All work is confined to the main queue, so unchecked Sendable is safe here.
+final class CallbackServer: @unchecked Sendable {
     private var listener: NWListener?
     private let port: UInt16
     private var codeContinuation: CheckedContinuation<String, Error>?

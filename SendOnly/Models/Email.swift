@@ -59,7 +59,7 @@ struct Email: Identifiable, Codable, Equatable {
 
     /// Converts markdown to HTML
     func markdownToHTML(_ markdown: String) -> String {
-        var lines = markdown.components(separatedBy: "\n")
+        let lines = markdown.components(separatedBy: "\n")
         var htmlLines: [String] = []
         var inUnorderedList = false
         var inOrderedList = false
