@@ -48,6 +48,39 @@ Audit pass — find where the app diverges from macOS conventions. Candidates to
 - [ ] Accessibility (VoiceOver labels, Full Keyboard Access, Dynamic Type where relevant).
 - [ ] Deliver findings as a prioritized list before implementing.
 
+### 5. Priority "peek" inbox (research / feasibility first)
+Idea: a lightweight, read-only view of the **most recent important messages** — a
+quick peek, not a full inbox — that surfaces what matters and hides
+newsletters/promotions.
+
+- [ ] **Design decision first:** this reverses Pigeon's founding "send-only, no
+      inbox, no distraction" premise. Decide how far to go — a tiny "recent &
+      important" glance vs. a real reading surface — before building.
+- [ ] **Gmail is the realistic data source.** Gmail already does the sorting for us
+      via the API:
+  - Filter by the built-in category labels — `CATEGORY_PROMOTIONS`,
+    `CATEGORY_SOCIAL`, `CATEGORY_UPDATES`, `CATEGORY_FORUMS`, `CATEGORY_PERSONAL`.
+  - Lean on Gmail's own priority guess: the `IMPORTANT` label + `is:important` /
+    `in:inbox category:primary` search queries via `messages.list`.
+  - So "important inbox" ≈ *Primary + IMPORTANT, minus Promotions/Social*. No custom
+    ML needed — reuse Gmail's smart mailboxes.
+- [ ] **⚠️ Cost/scope implication (important):** reading messages needs a Gmail
+      **read** scope (`gmail.readonly` or `gmail.modify`). Google classifies these as
+      **restricted**, a stricter tier than Pigeon's current *sensitive* scopes. In
+      production that path can require the **paid annual CASA security assessment** —
+      the cost we specifically avoided (see `PROGRESS.md` §5). Confirm this before
+      committing; it may be the deciding factor.
+- [ ] **Apple Mail is not a good source.** No clean public API for third-party apps to
+      read its smart mailboxes; would mean fragile AppleScript or poking at local Mail
+      data. Skip in favor of the Gmail API.
+- [ ] Open questions: read-only or allow archive/mark-read (changes scope + risk)?
+      How many messages / how far back? Refresh cadence & caching? Where does it live
+      (menu-bar dropdown section vs. separate window vs. iOS tab)? Does an inbox dilute
+      the product's identity?
+- [ ] Suggested next step: a small spike — list Primary+Important, excluding
+      Promotions/Social — to see how good Gmail's own sorting feels in practice before
+      any real UI work.
+
 ---
 
 ## Known smaller items (carried over)
