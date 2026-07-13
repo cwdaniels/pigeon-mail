@@ -48,38 +48,28 @@ Audit pass — find where the app diverges from macOS conventions. Candidates to
 - [ ] Accessibility (VoiceOver labels, Full Keyboard Access, Dynamic Type where relevant).
 - [ ] Deliver findings as a prioritized list before implementing.
 
-### 5. Priority "peek" inbox (research / feasibility first)
-Idea: a lightweight, read-only view of the **most recent important messages** — a
-quick peek, not a full inbox — that surfaces what matters and hides
+### 5. Priority "peek" inbox — ❌ Considered & declined (2026-07-12)
+Idea explored: a lightweight, read-only view of the **most recent important
+messages** — a quick peek, not a full inbox — surfacing what matters and hiding
 newsletters/promotions.
 
-- [ ] **Design decision first:** this reverses Pigeon's founding "send-only, no
-      inbox, no distraction" premise. Decide how far to go — a tiny "recent &
-      important" glance vs. a real reading surface — before building.
-- [ ] **Gmail is the realistic data source.** Gmail already does the sorting for us
-      via the API:
-  - Filter by the built-in category labels — `CATEGORY_PROMOTIONS`,
-    `CATEGORY_SOCIAL`, `CATEGORY_UPDATES`, `CATEGORY_FORUMS`, `CATEGORY_PERSONAL`.
-  - Lean on Gmail's own priority guess: the `IMPORTANT` label + `is:important` /
-    `in:inbox category:primary` search queries via `messages.list`.
-  - So "important inbox" ≈ *Primary + IMPORTANT, minus Promotions/Social*. No custom
-    ML needed — reuse Gmail's smart mailboxes.
-- [ ] **⚠️ Cost/scope implication (important):** reading messages needs a Gmail
-      **read** scope (`gmail.readonly` or `gmail.modify`). Google classifies these as
-      **restricted**, a stricter tier than Pigeon's current *sensitive* scopes. In
-      production that path can require the **paid annual CASA security assessment** —
-      the cost we specifically avoided (see `PROGRESS.md` §5). Confirm this before
-      committing; it may be the deciding factor.
-- [ ] **Apple Mail is not a good source.** No clean public API for third-party apps to
-      read its smart mailboxes; would mean fragile AppleScript or poking at local Mail
-      data. Skip in favor of the Gmail API.
-- [ ] Open questions: read-only or allow archive/mark-read (changes scope + risk)?
-      How many messages / how far back? Refresh cadence & caching? Where does it live
-      (menu-bar dropdown section vs. separate window vs. iOS tab)? Does an inbox dilute
-      the product's identity?
-- [ ] Suggested next step: a small spike — list Primary+Important, excluding
-      Promotions/Social — to see how good Gmail's own sorting feels in practice before
-      any real UI work.
+**Decision: not pursuing.** Two reasons, in order of weight:
+
+1. **It betrays Pigeon's identity (primary reason).** "Send-only, no inbox, no
+   distraction" is the whole point — the constraint *is* the feature. Even a small
+   peek-inbox starts the slope toward becoming a lite email client, competing with
+   the very apps Pigeon is a relief from. The simplicity is the beauty.
+2. **It breaks the cost model.** Reading messages needs a Gmail **read** scope
+   (`gmail.readonly` / `gmail.modify`), which Google rates as **restricted** — a
+   stricter tier than Pigeon's current *sensitive* scopes, and one that can require
+   the **paid annual CASA security assessment** in production (the cost deliberately
+   avoided — see `PROGRESS.md` §5). Declining the feature keeps Pigeon entirely out
+   of restricted scopes.
+
+_Reopen only if the product direction itself changes._ For the record, had it gone
+ahead the realistic approach was Gmail's own smart mailboxes (no custom ML): filter
+`messages.list` to *Primary + `IMPORTANT`, minus `CATEGORY_PROMOTIONS`/`CATEGORY_SOCIAL`*.
+Apple Mail was ruled out — no clean third-party API for its smart mailboxes.
 
 ---
 
